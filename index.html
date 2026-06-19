@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard delle prestazioni EXR Game. Analisi dettagliata delle sessioni di canottaggio indoor, grafici interattivi e consigli fisiologici.">
+    <title>EXR Performance Dashboard</title>
+    <!-- Google Fonts: Outfit & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-base: #0a0b10;
+            --bg-surface: rgba(20, 22, 33, 0.6);
+            --bg-card: rgba(28, 30, 46, 0.4);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            
+            /* Accents */
+            --color-sprint: #ec4899; /* Hot Pink */
+            --color-hiit: #06b6d4;   /* Cyan */
+            --color-endurance: #10b981; /* Emerald */
+            --color-accent: #6366f1;    /* Indigo */
+            --color-accent-glow: rgba(99, 102, 241, 0.15);
+            
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            line-height: 1.5;
+            padding: 2rem 1.5rem;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.05) 0%, transparent 40%);
+            background-attachment: fixed;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Container Layout */
+        .dashboard-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Glassmorphism Header */
+        header {
+            background: var(--bg-surface);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .header-left h1 {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #fff 30%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-left p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 0.25rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--color-accent), var(--color-hiit));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.9rem;
+            box-shadow: 0 0 15px var(--color-accent-glow);
+        }
+
+        .user-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--bg-surface);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glass);
+            border-radius: 18px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition-smooth);
+            box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 30px 0 rgba(0, 0, 0, 0.25);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--card-accent, var(--color-accent));
+        }
+
+        .stat-title {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #fff;
+        }
+
+        .stat-unit {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-left: 0.25rem;
+        }
+
+        .stat-footer {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Charts Layout */
+        .charts-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 900px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-box {
+            background: var(--bg-surface);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glass);
+            border-radius: 18px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chart-box h2 {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: #fff;
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+        }
+
+        /* Main Section & Filters */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .section-header h2 {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .filters-group {
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-glass);
+            padding: 0.35rem;
+            border-radius: 12px;
+        }
+
+        .filter-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .filter-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .filter-btn.active {
+            color: #fff;
+            background: var(--color-accent);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+        }
+
+        /* Workout List */
+        .workouts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .workout-card {
+            background: var(--bg-surface);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glass);
+            border-left: 5px solid var(--card-border-color, var(--color-accent));
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            transition: var(--transition-smooth);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .workout-card:hover {
+            transform: scale(1.005);
+            border-color: rgba(255, 255, 255, 0.15);
+            border-left-color: var(--card-border-color, var(--color-accent));
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 2-Column Responsive Layout for Workout Cards */
+        .workout-card-grid {
+            display: grid;
+            grid-template-columns: 2.2fr 1.3fr;
+            gap: 1.5rem;
+            align-items: stretch;
+        }
+
+        @media (max-width: 900px) {
+            .workout-card-grid {
+                grid-template-columns: 1fr;
+                gap: 1.25rem;
+            }
+        }
+
+        .workout-card-left {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .workout-card-right {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 1rem;
+            min-height: 200px;
+            position: relative;
+        }
+
+        .sparkline-title {
+            font-family: var(--font-display);
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .sparkline-title svg {
+            width: 12px;
+            height: 12px;
+            fill: var(--text-secondary);
+        }
+
+        .sparkline-canvas-container {
+            position: relative;
+            width: 100%;
+            height: 140px;
+        }
+
+        .workout-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .workout-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .workout-title {
+            font-family: var(--font-display);
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.01em;
+        }
+
+        .workout-date {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .workout-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.3rem 0.75rem;
+            border-radius: 20px;
+            color: #fff;
+            background: var(--badge-bg);
+            box-shadow: 0 2px 8px var(--badge-shadow);
+        }
+
+        /* Card Stats Grid */
+        .card-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .card-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .card-stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+        }
+
+        .card-stat-value {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .card-stat-unit {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-left: 0.15rem;
+        }
+
+        /* Insight Block */
+        .insight-block {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, rgba(6, 182, 212, 0.03) 100%);
+            border: 1px dashed rgba(99, 102, 241, 0.25);
+            border-radius: 12px;
+            padding: 1rem;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .insight-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--color-accent);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .insight-header svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--color-accent);
+        }
+
+        .insight-content {
+            font-size: 0.88rem;
+            color: var(--text-primary);
+            line-height: 1.5;
+            font-style: italic;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            border-top: 1px solid var(--border-glass);
+            margin-top: 2rem;
+        }
+        @keyframes pulse-emoji {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        
+        <!-- Milestone Banner (Hidden by default) -->
+        <div id="milestone-banner" style="display: none; background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%); color: #000; padding: 1.5rem 2rem; border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.4); text-align: center; position: relative; overflow: hidden; align-items: center; justify-content: center; gap: 1.5rem;">
+            <div style="font-size: 3.5rem; animation: pulse-emoji 2s infinite;">🏆</div>
+            <div style="text-align: left;">
+                <h2 style="margin: 0; font-family: var(--font-display); font-size: 2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #000;">Traguardo Epico Sbloccato!</h2>
+                <p style="margin: 0.5rem 0 0 0; font-size: 1.15rem; font-weight: 600; color: rgba(0,0,0,0.8);">Hai ufficialmente superato i <span style="font-size: 1.4rem; font-weight: 900; color: #000;">100 km</span> di voga totali! Centomila metri di sudore, calli e dedizione pura. Sei una fottuta macchina da guerra. 🦾</p>
+            </div>
+            <div style="font-size: 3.5rem; animation: pulse-emoji 2s infinite; animation-delay: 1s;">🔥</div>
+        </div>
+
+        <!-- Header -->
+        <header>
+            <div class="header-left">
+                <h1 id="main-title">EXR Performance Dashboard</h1>
+                <p id="sub-title">Telemetria di canottaggio indoor & analisi fisiologiche personali</p>
+            </div>
+            <div class="header-right">
+                <div class="user-profile" id="profile-container">
+                    <div class="avatar">SF</div>
+                    <span class="user-name">Stefano Farise</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Overview -->
+        <section class="stats-grid" id="stats-overview" aria-label="Sommario Statistiche">
+            <div class="stat-card" style="--card-accent: var(--color-accent);" id="stat-workouts">
+                <span class="stat-title">Allenamenti Totali</span>
+                <span class="stat-value" id="val-workouts">0</span>
+                <span class="stat-footer">Sessioni registrate</span>
+            </div>
+            <div class="stat-card" style="--card-accent: var(--color-hiit);" id="stat-distance">
+                <span class="stat-title">Distanza Totale</span>
+                <span class="stat-value" id="val-distance">0.0<span class="stat-unit">km</span></span>
+                <span class="stat-footer">Distanza cumulativa coperta</span>
+            </div>
+            <div class="stat-card" style="--card-accent: var(--color-sprint);" id="stat-power">
+                <span class="stat-title">Picco Potenza Max</span>
+                <span class="stat-value" id="val-maxpower">0<span class="stat-unit">W</span></span>
+                <span class="stat-footer">Massima forza sprigionata</span>
+            </div>
+            <div class="stat-card" style="--card-accent: var(--color-endurance);" id="stat-calories">
+                <span class="stat-title">Calorie Bruciate</span>
+                <span class="stat-value" id="val-calories">0<span class="stat-unit">kcal</span></span>
+                <span class="stat-footer">Dispendio energetico stimato</span>
+            </div>
+        </section>
+
+        <!-- Charts Grid -->
+        <section class="charts-container" id="charts-section">
+            <div class="chart-box">
+                <h2>Profilo di Potenza (Progressione)</h2>
+                <div class="canvas-container">
+                    <canvas id="powerChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-box">
+                <h2>Ripartizione Calorie e Distanze</h2>
+                <div class="canvas-container">
+                    <canvas id="volumeChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Aggiunta: Consigli del Coach & Analisi Tecnica -->
+        <section class="coach-advice-section" style="margin-top: 2rem; background: var(--bg-surface); backdrop-filter: blur(12px); border: 1px solid var(--border-glass); border-radius: 18px; padding: 2rem; box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.15);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-glass); padding-bottom: 1rem;">
+                <h2 style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--color-accent); margin: 0;">🧘‍♂️ Maestria Aerobica: Il Potere del Recupero Attivo</h2>
+                <span style="background: rgba(99, 102, 241, 0.2); color: #6366f1; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">Analisi Ultimo Workout (Regeneration training 4)</span>
+            </div>
+            
+            <p style="color: var(--text-secondary); font-size: 1.05rem; line-height: 1.6; margin-bottom: 2rem;">
+                Hai eseguito alla lettera il protocollo di scarico che avevamo pianificato. Dopo il massacro dei 10.4km di ieri, hai abbassato l'ego, hai rallentato la macchina e ti sei concentrato sull'efficienza. Questa sessione è un capolavoro di disciplina neuromuscolare.
+             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2.5rem;">
+                <div style="background: rgba(255,255,255,0.03); padding: 1.2rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                    <h4 style="color: #9ca3af; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Battito Medio</h4>
+                    <div style="display: flex; align-items: baseline; gap: 0.5rem;">
+                        <span style="color: #10b981; font-size: 1.6rem; font-weight: 700;">138 bpm</span>
+                        <span style="color: #ec4899; font-size: 0.95rem;">(Picco: 162 bpm)</span>
+                    </div>
+                    <p style="color: #9ca3af; font-size: 0.85rem; margin-top: 0.5rem; line-height: 1.4;">Picco in Zona 4 pura all'89% del massimale.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); padding: 1.2rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                    <h4 style="color: #9ca3af; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Potenza Media</h4>
+                    <div style="display: flex; align-items: baseline; gap: 0.5rem;">
+                        <span style="color: #3b82f6; font-size: 1.6rem; font-weight: 700;">169 W</span>
+                        <span style="color: #9ca3af; font-size: 0.95rem;">(Picco: 273.7 W)</span>
+                    </div>
+                    <p style="color: #9ca3af; font-size: 0.85rem; margin-top: 0.5rem; line-height: 1.4;">Impressionanti i 250+ Watt tenuti durante gli intervalli.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); padding: 1.2rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                    <h4 style="color: #9ca3af; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Cadenza Media</h4>
+                    <div style="display: flex; align-items: baseline; gap: 0.5rem;">
+                        <span style="color: #f59e0b; font-size: 1.6rem; font-weight: 700;">22.0 SPM</span>
+                        <span style="color: #9ca3af; font-size: 0.95rem;">(Picco: 37.7 SPM)</span>
+                    </div>
+                    <p style="color: #9ca3af; font-size: 0.85rem; margin-top: 0.5rem; line-height: 1.4;">Aggressività pura negli sprint (quasi 38 colpi/min).</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); padding: 1.2rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                    <h4 style="color: #9ca3af; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Forza Picco</h4>
+                    <div style="display: flex; align-items: baseline; gap: 0.5rem;">
+                        <span style="color: #8b5cf6; font-size: 1.6rem; font-weight: 700;">42.9 kgf</span>
+                    </div>
+                    <p style="color: #9ca3af; font-size: 0.85rem; margin-top: 0.5rem; line-height: 1.4;">Spinta brutale sui pedali per rompere l'inerzia a 37 SPM.</p>
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 2rem;">
+                <div>
+                    <h3 style="color: #fff; font-size: 1.3rem; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">📈 1. Il Picco a 162 bpm (L'Adattamento)</h3>
+                    <p style="color: var(--text-secondary); line-height: 1.7; font-size: 1.05rem; margin: 0;">
+                        L'analisi dei tuoi battiti cardiaci è pazzesca. Durante il penultimo intervallo, durato quasi un minuto a oltre 245W medi, il tuo cuore ha toccato i <strong>162 bpm</strong>. Per un'atleta di 40 anni con 181 di Max HR, significa spingersi quasi al 90% del massimale, nel cuore della Zona 4. È uno stimolo cardiovascolare massiccio che costringe il corpo ad aumentare la gittata cardiaca e il VO2Max.
+                    </p>
+                </div>
+
+                <div>
+                    <h3 style="color: #fff; font-size: 1.3rem; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">⚡ 2. I 273 Watt e la Cadenza Esplosiva</h3>
+                    <p style="color: var(--text-secondary); line-height: 1.7; font-size: 1.05rem; margin: 0;">
+                        Passare da una sessione di scarico (a 20 SPM) a sparare picchi a <strong>37.7 SPM</strong> richiede una reattività neuromuscolare eccellente. Hai portato la Forza di Picco a <strong>42.9 kgf</strong> per poter sostenere le raffiche sopra i 250 Watt. È la pura dimostrazione della trasformazione da vogata di resistenza a vogata anaerobica da sprinter.
+                    </p>
+                </div>
+            </div>   </div>
+            </div>
+
+            <div style="margin-top: 3rem; padding: 2rem; background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.05) 100%); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 16px; position: relative; overflow: hidden;">
+                <div style="position: absolute; top: -10px; right: -10px; font-size: 8rem; opacity: 0.05; transform: rotate(15deg); pointer-events: none;">🔥</div>
+                <h3 style="color: #ef4444; margin-bottom: 1rem; font-size: 1.4rem; display: flex; align-items: center; gap: 0.5rem; position: relative; z-index: 1;">🎯 Analisi: Aerobic Capacity 2 (Il cedimento)</h3>
+                <p style="color: #fff; font-style: normal; line-height: 1.7; font-size: 1.05rem; margin: 0; position: relative; z-index: 1;">
+                    Ho visto i dati della tua ultima sessione. E ho anche decifrato il tuo messaggio (il correttore vocale ha scritto <em>"non mi hai analizzato bene l'ultimo"</em> ma so che intendevi <em>"non mi è <strong>andato</strong> bene l'ultimo"</em> scatto!).<br><br>
+                    <strong>L'Anatomia di un HIIT Perfetto:</strong><br>
+                    Non devi assolutamente rimproverarti per quell'ultimo intervallo abortito. Anzi, è la prova che hai lavorato esattamente come dovevi. Hai fatto tre picchi brutali:<br>
+                    1. <strong>Primo scatto:</strong> 57s a <strong>253 Watt</strong> (HR max 150 bpm)<br>
+                    2. <strong>Il Penultimo scatto (IL CAPOLAVORO):</strong> 57s a <strong>247 Watt</strong>. Qui il cuore ha fatto uno sforzo magnifico, pompando fino a <strong>162 bpm</strong> (piena Zona 4, all'89% del tuo massimale). È in questo minuto esatto che hai generato il massimo adattamento cardiovascolare.<br>
+                    3. <strong>L'ultimo scatto:</strong> Sei partito ancora più aggressivo a <strong>257 Watt</strong>, ma il sistema ATP-PC (fosfati) era prosciugato e il muscolo ha detto "basta" dopo 18 secondi. Questo si chiama <em>cedimento muscolare tecnico</em> ed è l'obiettivo finale degli sprint brevi.<br><br>
+                    
+                    <strong>Il Prossimo Step:</strong> Dato che hai esaurito completamente il glicogeno con questi scatti (e la Forza di Picco è schizzata a quasi 43 kgf), per il prossimo allenamento torniamo a costruire la base. Ti consiglio un <strong>Endurance Dash</strong>: 40 minuti agili, cadenza bassa (20 SPM), tenendo il cuore blindato intorno ai 130 bpm, con solo qualche accelerazione di 10 secondi per risvegliare le gambe senza produrre acido lattico.
+                </p>
+
+                <!-- WORKOUT CARD INJECTED -->
+                <div style="margin-top: 2rem; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1.5rem; position: relative; z-index: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <h4 style="color: #fff; font-size: 1.2rem; margin: 0 0 0.5rem 0;">Endurance Dash</h4>
+                        <span style="background: rgba(59, 130, 246, 0.2); color: #3b82f6; font-size: 0.8rem; font-weight: bold; padding: 4px 10px; border-radius: 12px; letter-spacing: 1px;">AEROBIC ENDURANCE</span>
+                    </div>
+                    <p style="color: #9ca3af; font-size: 0.95rem; margin: 0 0 1.5rem 0; max-width: 600px;">Easy endurance training with short sprints to boost the efficiency of your mitochondria. (Durata: 40 min)</p>
+                    
+                    <div id="recommendedWorkoutGraph" style="display: flex; align-items: flex-end; height: 120px; border-bottom: 1px solid rgba(255,255,255,0.2); gap: 1px; padding-bottom: 2px;">
+                        <!-- JS populate -->
+                    </div>
+                    
+                    <script>
+                    (function() {
+                        const steps = [
+                            {"dur":300, "pwr":0.6}, {"dur":12, "pwr":2.0}, {"dur":288, "pwr":0.7},
+                            {"dur":12, "pwr":2.0}, {"dur":288, "pwr":0.7}, {"dur":12, "pwr":2.0},
+                            {"dur":288, "pwr":0.7}, {"dur":12, "pwr":2.0}, {"dur":288, "pwr":0.7},
+                            {"dur":12, "pwr":2.0}, {"dur":288, "pwr":0.7}, {"dur":12, "pwr":2.0},
+                            {"dur":288, "pwr":0.7}, {"dur":300, "pwr":0.6}
+                        ];
+                        const maxPwr = 2.0;
+                        const totalDur = 2400;
+                        const container = document.getElementById('recommendedWorkoutGraph');
+                        
+                        function getPhaseColor(pwr) {
+                            if (pwr >= 1.05) return '#ef4444'; // Red
+                            if (pwr >= 0.9) return '#f59e0b'; // Yellow
+                            if (pwr >= 0.75) return '#10b981'; // Green
+                            if (pwr > 0.5) return '#3b82f6'; // Blue
+                            return '#64748b'; // Grey
+                        }
+                    
+                        steps.forEach(s => {
+                            let bar = document.createElement('div');
+                            bar.style.width = ((s.dur / totalDur) * 100) + '%';
+                            bar.style.height = ((s.pwr / maxPwr) * 100) + '%';
+                            bar.style.backgroundColor = getPhaseColor(s.pwr);
+                            bar.style.opacity = '0.9';
+                            bar.style.borderRadius = '2px 2px 0 0';
+                            bar.title = s.dur + "s @ " + Math.round(s.pwr*100) + "% FTP";
+                            container.appendChild(bar);
+                        });
+                    })();
+                    </script>
+                </div>
+            </div>
+        </section>
+
+        <!-- Workouts List Section -->
+        <section class="workout-section">
+            <div class="section-header">
+                <h2>Storico Sessioni & Insights</h2>
+                <div class="filters-group" role="tablist">
+                    <button class="filter-btn active" id="btn-all" onclick="filterWorkouts('all')">Tutti</button>
+                    <button class="filter-btn" id="btn-hiit" onclick="filterWorkouts('hiit')">HIIT</button>
+                    <button class="filter-btn" id="btn-sprint" onclick="filterWorkouts('sprint')">Sprints</button>
+                    <button class="filter-btn" id="btn-endurance" onclick="filterWorkouts('endurance')">Resistenza</button>
+                </div>
+            </div>
+            
+            <div class="workouts-list" id="workouts-list-container" style="margin-top: 1.5rem;">
+                <!-- Loaded dynamically by JS -->
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <p>&copy; 2026 EXR Performance Analyzer. Sviluppato per Stefano Farise.</p>
+            <p style="font-size: 0.75rem;">I dati sono letti ed elaborati localmente dai file .fit originali estratti da account.exrgame.com.</p>
+        </footer>
+
+    </div>
+
+    <!-- Inject training data from data.js -->
+    <script src="data.js"></script>
+    <script src="smartrower_data.js"></script>
+    <script>
+        // Global variables for charts to enable updates
+        let powerChartObj = null;
+        let volumeChartObj = null;
+
+        // Categorize workouts dynamically based on stats
+        function getWorkoutType(workout) {
+            const avgP = workout.avg_power || 0;
+            const maxP = workout.max_power || 0;
+            const dur = workout.duration_min || 0;
+            const filename = workout.filename ? workout.filename.toLowerCase() : "";
+
+            if (filename.includes("hiit") || filename.includes("pyramid") || (maxP > 280 && dur > 15)) {
+                return {
+                    id: "hiit",
+                    name: "HIIT Pyramid",
+                    color: "var(--color-hiit)",
+                    badgeBg: "rgba(6, 182, 212, 0.2)",
+                    badgeShadow: "rgba(6, 182, 212, 0.3)"
+                };
+            } else if (maxP > 400 || (avgP > 240 && dur <= 5) || dur <= 4) {
+                return {
+                    id: "sprint",
+                    name: "Sprint Test",
+                    color: "var(--color-sprint)",
+                    badgeBg: "rgba(236, 72, 153, 0.2)",
+                    badgeShadow: "rgba(236, 72, 153, 0.3)"
+                };
+            } else {
+                return {
+                    id: "endurance",
+                    name: "Endurance",
+                    color: "var(--color-endurance)",
+                    badgeBg: "rgba(16, 185, 129, 0.2)",
+                    badgeShadow: "rgba(16, 185, 129, 0.3)"
+                };
+            }
+        }
+
+        // Generate tailored physiological insight in Italian
+        function generateCoachInsight(workout) {
+            const avgP = workout.avg_power || 0;
+            const maxP = workout.max_power || 0;
+            const dur = workout.duration_min || 0;
+            const spm = workout.avg_cadence || 0;
+            const maxSpm = workout.max_cadence || 0;
+            const dist = workout.distance_m || 0;
+            const type = getWorkoutType(workout).id;
+
+            if (type === "sprint") {
+                if (maxP > 700) {
+                    return `Esplosività devastante! Hai toccato un picco incredibile di <strong>${maxP} W</strong> con una cadenza massima di <strong>${maxSpm} colpi/min</strong>. Questo dimostra una potenza neuromuscolare d'élite, eccezionale per reclutare le fibre a contrazione rapida (tipo IIx) e stimolare la forza esplosiva.`;
+                }
+                return `Sprint ad alta intensità a cadenza elevata (<strong>${spm} spm</strong> di media). Ottimo stimolo per la tolleranza al lattato e il condizionamento anaerobico. Lavori di questa durata sviluppano la capacità di sprigionare forza elevata sotto stress muscolare immediato.`;
+            } else if (type === "hiit") {
+                return `Allenamento HIIT strutturato di altissimo valore fisiologico. Le ampie escursioni di potenza tra i <strong>${avgP} W</strong> medi e i <strong>${maxP} W</strong> di picco durante gli intervalli costringono il cuore a variare continuamente frequenza, stimolando in modo ottimale il consumo calorico post-esercizio (EPOC) e migliorando il tuo VO2 Max sul Charles River.`;
+            } else { // endurance
+                let base = `Grande sessione di endurance costante. Coprire <strong>${(dist/1000).toFixed(2)} km</strong> mantenendo un colpo fluido e stabile a <strong>${spm} spm</strong> è perfetto per rafforzare la base aerobica e la capillarizzazione muscolare.`;
+                if (avgP >= 150) {
+                    base += ` Ottimo anche l'apporto di potenza media di <strong>${avgP} W</strong>, che rende questo allenamento eccellente sia per l'efficienza cardiaca che per il metabolismo lipidico.`;
+                }
+                return base;
+            }
+        }
+
+        // Calculate and render dashboard stats
+        function updateDashboardStats(data) {
+            const count = data.length;
+            const totalDistance = data.reduce((acc, curr) => acc + (curr.distance_m || 0), 0) / 1000.0;
+            const maxPower = data.reduce((acc, curr) => Math.max(acc, (curr.max_power || 0)), 0);
+            const totalCalories = data.reduce((acc, curr) => acc + (curr.calories || 0), 0);
+
+            document.getElementById("val-workouts").textContent = count;
+            document.getElementById("val-distance").innerHTML = `${totalDistance.toFixed(2)}<span class="stat-unit">km</span>`;
+            document.getElementById("val-maxpower").innerHTML = `${maxPower}<span class="stat-unit">W</span>`;
+            document.getElementById("val-calories").innerHTML = `${totalCalories.toLocaleString()}<span class="stat-unit">kcal</span>`;
+            
+            if (totalDistance >= 100) {
+                const banner = document.getElementById("milestone-banner");
+                if (banner) banner.style.display = "flex";
+            }
+        }
+
+        // Render workout cards
+        function renderWorkoutsList(data) {
+            const container = document.getElementById("workouts-list-container");
+            container.innerHTML = "";
+
+            if (data.length === 0) {
+                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 3rem;">Nessun allenamento trovato per questo filtro.</div>`;
+                return;
+            }
+
+            data.forEach((w, index) => {
+                const typeInfo = getWorkoutType(w);
+                const isSmartRower = w.source === 'smartrower';
+                const insight = isSmartRower ? 
+                    `Hardware Sync: Forza Picco Media ${w.smartrower.avg_peak_force}. Clicca per vedere l'analisi a blocchi e i grafici avanzati.` : 
+                    generateCoachInsight(w);
+                
+                const card = document.createElement("article");
+                card.className = "workout-card";
+                card.style.setProperty("--card-border-color", isSmartRower ? "#ffc107" : typeInfo.color);
+                if (isSmartRower) {
+                    card.style.cursor = "pointer";
+                    card.onclick = () => openSmartRowerModal(index);
+                }
+                
+                let title = isSmartRower ? `SmartRower | ${w.title}` : typeInfo.name;
+                if (!isSmartRower) {
+                    if (w.filename.toLowerCase().includes("hiit")) title = "EXR | HIIT Pyramid 1";
+                    else if (w.distance_m === 500.8 || w.distance_m === 500) title = "EXR | Sprint Test 500m";
+                    else if (w.distance_m === 1001.2 || w.distance_m === 1000) title = "EXR | Time Trial 1000m";
+                    else if (w.duration_min >= 15) title = `EXR | Fondo Aerobico ${(w.distance_m/1000).toFixed(1)}K`;
+                    else title = `EXR | Rowing Session ${(w.distance_m/1000).toFixed(2)} km`;
+                }
+
+                card.innerHTML = `
+                    <div class="workout-card-grid">
+                        <div class="workout-card-left">
+                            <div class="workout-top">
+                                <div class="workout-meta">
+                                    <span class="workout-title">${title}</span>
+                                    ${isSmartRower ? '<span class="badge-smartrower">SMARTROWER</span>' : ''}
+                                    <span class="workout-date" style="margin-left:auto;">
+                                        ${w.date}
+                                    </span>
+                                </div>
+                                ${!isSmartRower ? `<span class="workout-badge" style="--badge-bg: ${typeInfo.badgeBg}; --badge-shadow: ${typeInfo.badgeShadow};">${typeInfo.name}</span>` : ''}
+                            </div>
+
+                            <div class="card-stats-grid">
+                                <div class="card-stat">
+                                    <span class="card-stat-label">Durata</span>
+                                    <span class="card-stat-value">${w.duration_min}<span class="card-stat-unit">min</span></span>
+                                </div>
+                                <div class="card-stat">
+                                    <span class="card-stat-label">Distanza</span>
+                                    <span class="card-stat-value">${w.distance_m.toLocaleString()}<span class="card-stat-unit">m</span></span>
+                                </div>
+                                <div class="card-stat">
+                                    <span class="card-stat-label">Potenza Media</span>
+                                    <span class="card-stat-value">${w.avg_power}<span class="card-stat-unit">W</span></span>
+                                </div>
+                                <div class="card-stat">
+                                    <span class="card-stat-label">Potenza Picco</span>
+                                    <span class="card-stat-value">${w.max_power}<span class="card-stat-unit">W</span></span>
+                                </div>
+                                <div class="card-stat">
+                                    <span class="card-stat-label">Cadenza Media</span>
+                                    <span class="card-stat-value">${w.avg_cadence}<span class="card-stat-unit">spm</span></span>
+                                </div>
+                                <div class="card-stat">
+                                    <span class="card-stat-label">Energia</span>
+                                    <span class="card-stat-value">${w.calories}<span class="card-stat-unit">kcal</span></span>
+                                </div>
+                            </div>
+
+                            <div class="insight-block">
+                                <div class="insight-header">Antigravity Coach Insights</div>
+                                <p class="insight-content">${insight}</p>
+                            </div>
+                        </div>
+                        <div class="workout-card-right">
+                            <span class="sparkline-title">Profilo di Potenza</span>
+                            <div class="sparkline-canvas-container">
+                                <canvas id="sparkline-${index}"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+
+                const canvasId = `sparkline-${index}`;
+                if (isSmartRower && w.smartrower && w.smartrower.chart && w.smartrower.chart.real_watts) {
+                    renderSparkline(canvasId, w.smartrower.chart.real_watts, "#ffc107");
+                } else if (w.power_series && w.power_series.length > 0) {
+                    renderSparkline(canvasId, w.power_series, typeInfo.color);
+                } else {
+                    const canvasEl = document.getElementById(canvasId);
+                    if (canvasEl) canvasEl.parentElement.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 2rem 0;">Nessun dettaglio</div>`;
+                }
+            });
+        }
+
+        // Helper to render per-workout power charts with matching theme colors
+        function renderSparkline(canvasId, seriesData, colorVar) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            
+            // Map CSS theme variables to direct hex codes for optimal opacity gradients
+            let colorHex = "#6366f1"; 
+            if (colorVar.includes("hiit")) colorHex = "#06b6d4";
+            else if (colorVar.includes("sprint")) colorHex = "#ec4899";
+            else if (colorVar.includes("endurance")) colorHex = "#10b981";
+            
+            const gradient = ctx.createLinearGradient(0, 0, 0, 140);
+            gradient.addColorStop(0, colorHex + "33"); // 20% Opacity
+            gradient.addColorStop(1, colorHex + "00"); // 0% Opacity
+            
+            const labels = seriesData.map((_, i) => `${Math.round((i / (seriesData.length - 1)) * 100)}%`);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: seriesData,
+                        borderColor: colorHex,
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0,
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        pointHoverRadius: 4,
+                        pointHoverBackgroundColor: colorHex,
+                        pointHoverBorderColor: "#fff",
+                        pointHoverBorderWidth: 1.5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(10, 11, 16, 0.95)',
+                            titleColor: '#9ca3af',
+                            bodyColor: '#fff',
+                            borderColor: 'rgba(255, 255, 255, 0.08)',
+                            borderWidth: 1,
+                            padding: 8,
+                            displayColors: false,
+                            callbacks: {
+                                title: () => 'Progresso Sessione',
+                                label: (context) => `Potenza: ${context.raw} W`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { display: false },
+                        y: {
+                            min: 0,
+                            display: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.02)',
+                                drawTicks: false
+                            },
+                            ticks: {
+                                color: 'rgba(156, 163, 175, 0.4)',
+                                font: { size: 9, family: 'Inter' },
+                                maxTicksLimit: 3,
+                                callback: (value) => `${value}W`
+                            },
+                            border: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Render charts
+        function renderCharts(data) {
+            // We want to sort chronologically for progression graph (oldest to newest)
+            const chronologicalData = [...data].reverse();
+            const labels = chronologicalData.map(w => w.date.split(" ")[0]);
+            
+            const avgPowers = chronologicalData.map(w => w.avg_power);
+            const maxPowers = chronologicalData.map(w => w.max_power);
+            
+            const distances = chronologicalData.map(w => w.distance_m);
+            const calories = chronologicalData.map(w => w.calories);
+
+            // Destroy previous charts if they exist
+            if (powerChartObj) powerChartObj.destroy();
+            if (volumeChartObj) volumeChartObj.destroy();
+
+            // 1. Power Progress Chart
+            const ctxPower = document.getElementById('powerChart').getContext('2d');
+            powerChartObj = new Chart(ctxPower, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Potenza Media (W)',
+                            data: avgPowers,
+                            borderColor: '#6366f1',
+                            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                            fill: true,
+                            tension: 0,
+                            borderWidth: 3,
+                            pointBackgroundColor: '#6366f1'
+                        },
+                        {
+                            label: 'Potenza Massima (W)',
+                            data: maxPowers,
+                            borderColor: '#ec4899',
+                            backgroundColor: 'transparent',
+                            fill: false,
+                            tension: 0,
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            pointBackgroundColor: '#ec4899'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#9ca3af',
+                                font: { family: 'Inter', size: 11 }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#9ca3af', font: { family: 'Inter', size: 10 } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#9ca3af', font: { family: 'Inter', size: 10 } }
+                        }
+                    }
+                }
+            });
+
+            // 2. Volume Chart
+            const ctxVolume = document.getElementById('volumeChart').getContext('2d');
+            volumeChartObj = new Chart(ctxVolume, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Distanza (m)',
+                            data: distances,
+                            backgroundColor: 'rgba(6, 182, 212, 0.65)',
+                            borderColor: '#06b6d4',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Calorie (kcal)',
+                            data: calories,
+                            backgroundColor: 'rgba(16, 185, 129, 0.65)',
+                            borderColor: '#10b981',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#9ca3af',
+                                font: { family: 'Inter', size: 11 }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.03)' },
+                            ticks: { color: '#9ca3af', font: { family: 'Inter', size: 10 } }
+                        },
+                        y: {
+                            position: 'left',
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#06b6d4', font: { family: 'Inter', size: 10 } }
+                        },
+                        y1: {
+                            position: 'right',
+                            grid: { drawOnChartArea: false },
+                            ticks: { color: '#10b981', font: { family: 'Inter', size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Filter workouts function
+        function filterWorkouts(category) {
+            document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
+            const targetBtn = document.getElementById(`btn-${category}`);
+            if (targetBtn) targetBtn.classList.add("active");
+
+            let filteredData = ALL_DATA;
+            if (category !== "all") {
+                filteredData = ALL_DATA.filter(w => getWorkoutType(w).id === category);
+            }
+            renderWorkoutsList(filteredData);
+        }
+
+
+        // Global Array
+        let ALL_DATA = [];
+
+        // Initialize dashboard
+        window.addEventListener("DOMContentLoaded", () => {
+            let wd = typeof WORKOUT_DATA !== "undefined" ? WORKOUT_DATA : [];
+            let sd = typeof SMARTROWER_DATA !== "undefined" ? SMARTROWER_DATA : [];
+            
+            ALL_DATA = wd.concat(sd);
+            // Sort by date desc
+            ALL_DATA.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            if (ALL_DATA.length > 0) {
+                updateDashboardStats(ALL_DATA);
+                renderCharts(ALL_DATA);
+                renderWorkoutsList(ALL_DATA);
+            } else {
+                document.getElementById("workouts-list-container").innerHTML = `
+                    <div style="text-align: center; color: var(--text-muted); padding: 5rem;">
+                        Nessun dato di allenamento caricato.
+                    </div>`;
+            }
+        });
+        
+        function openSmartRowerModal(index) {
+            const w = ALL_DATA[index];
+            if(!w || w.source !== 'smartrower') return;
+            
+            document.getElementById('srModal').style.display = "block";
+            document.getElementById('srModalTitle').innerText = w.title + " - Dettaglio Avanzato";
+            
+            // Populate table
+            const tbody = document.querySelector('#srModalTable tbody');
+            tbody.innerHTML = "";
+            w.smartrower.blocks.forEach(b => {
+                tbody.innerHTML += `<tr>
+                    <td>${b.time}</td>
+                    <td>${b.duration_min}</td>
+                    <td>${b.target_watts}</td>
+                    <td style="color: ${Math.abs(b.target_watts - b.real_watts) > 15 ? '#ec4899' : '#10b981'}">${b.real_watts}</td>
+                    <td>${b.target_spm}</td>
+                    <td>${b.real_spm}</td>
+                    <td>${b.target_force}</td>
+                    <td style="color: ${Math.abs(b.target_force - b.real_peak_force) > 3 ? '#ec4899' : '#10b981'}">${b.real_peak_force}</td>
+                </tr>`;
+            });
+            
+            // Render 3 charts
+            renderModalChart('srModalChartPower', w.smartrower.chart.time_s, w.smartrower.chart.target_watts, w.smartrower.chart.real_watts, 'Power (W)', '#ff4d4d', 'Target W', 'Real W', w.smartrower.chart.heart_rate);
+            renderModalChartStroke('srModalChartSPM', w.smartrower.chart.time_s, w.smartrower.chart.target_spm, w.smartrower.chart.stroke_t, w.smartrower.chart.stroke_spm, 'Cadence (SPM)', '#4da6ff', 'Target SPM', 'Real SPM');
+            renderModalChartStroke('srModalChartForce', w.smartrower.chart.time_s, w.smartrower.chart.target_force, w.smartrower.chart.stroke_t, w.smartrower.chart.stroke_peak_force, 'Force', '#ffcc00', 'Target Force', 'Peak Force');
+
+            // Force Curves & Coaching (Dynamic SPM)
+            const forceSection = document.querySelector('.sr-force-curve-section');
+            const tabsContainer = document.getElementById('srForceSpmTabs');
+            tabsContainer.innerHTML = '';
+
+            if (w.smartrower.force_curves && Object.keys(w.smartrower.force_curves).length > 0) {
+                const spms = Object.keys(w.smartrower.force_curves).sort((a,b) => parseInt(a) - parseInt(b));
+                
+                spms.forEach((spm, index) => {
+                    const btn = document.createElement('button');
+                    btn.innerText = spm + " SPM";
+                    btn.style.padding = "6px 12px";
+                    btn.style.borderRadius = "6px";
+                    btn.style.border = "1px solid rgba(255,255,255,0.2)";
+                    btn.style.background = "transparent";
+                    btn.style.color = "#fff";
+                    btn.style.cursor = "pointer";
+                    btn.style.fontFamily = "var(--font-base)";
+                    btn.style.fontSize = "0.9rem";
+                    
+                    btn.onclick = () => {
+                        Array.from(tabsContainer.children).forEach(c => {
+                            c.style.background = 'transparent';
+                            c.style.borderColor = 'rgba(255,255,255,0.2)';
+                        });
+                        btn.style.background = 'rgba(99, 102, 241, 0.2)';
+                        btn.style.borderColor = '#6366f1';
+                        renderForceCurveBySpm(w.smartrower.force_curves[spm], w, spm);
+                    };
+                    tabsContainer.appendChild(btn);
+                });
+                
+                forceSection.style.display = 'block';
+                if(tabsContainer.firstChild) tabsContainer.firstChild.click();
+            } else {
+                forceSection.style.display = 'none';
+            }
+        }
+        
+        function renderForceCurveBySpm(dataSpm, currentSession, currentSpmStr) {
+            if(!dataSpm || !dataSpm.start || dataSpm.start.length === 0) return;
+            renderForceCurveChart('srModalChartForceCurve', dataSpm);
+            
+            const peakLoc = dataSpm.peak_location_mid;
+            let coachMsg = "";
+            if (peakLoc < 0.4) {
+                coachMsg = "🚀 <strong>Ottimo Catch:</strong> Il picco di forza avviene molto presto (a " + peakLoc + "s). Ottima spinta esplosiva di gambe all'attacco!";
+            } else if (peakLoc > 0.6) {
+                coachMsg = "⚠️ <strong>Spinta Tardiva:</strong> Il picco di forza è ritardato a " + peakLoc + "s. Concentra l'esplosività subito all'attacco premendo forte sui talloni.";
+            } else {
+                coachMsg = "⚖️ <strong>Spinta Bilanciata:</strong> Il picco di forza è centrale (a " + peakLoc + "s). Buona coordinazione generale gambe-schiena-braccia.";
+            }
+            
+            const startMax = Math.max(...dataSpm.start);
+            const endMax = Math.max(...dataSpm.end);
+            const drop = Math.round((1 - (endMax / startMax)) * 100);
+            if (drop > 15) {
+                coachMsg += "<br><br>📉 <strong>Fatica Rilevata:</strong> C'è un calo del " + drop + "% del picco di forza a questa andatura verso la fine.";
+            } else if (drop < -10) {
+                coachMsg += "<br><br>📈 <strong>Negative Split:</strong> Ottimo! Hai espresso più forza alla fine che all'inizio a questa andatura.";
+            } else {
+                coachMsg += "<br><br>🔋 <strong>Costanza:</strong> Ottima tenuta muscolare, le curve sono molto simili tra inizio e fine allenamento a questa andatura.";
+            }
+            
+            // Pace & Historical Comparison
+            const currentSpm = parseInt(currentSpmStr);
+            const blocksSpm = currentSession.smartrower.blocks.filter(b => b.target_spm === currentSpm);
+            let avgW = currentSession.avg_power;
+            let metricName = "Medio Sessione";
+            if (blocksSpm.length > 0) {
+                avgW = blocksSpm.reduce((acc, b) => acc + b.real_watts * b.duration_min, 0) / blocksSpm.reduce((acc, b) => acc + b.duration_min, 0);
+                metricName = `a ${currentSpm} SPM`;
+            }
+            
+            avgW = Math.round(avgW);
+            const paceS = 500 * Math.pow((2.80 / avgW), 1/3);
+            const paceMin = Math.floor(paceS / 60);
+            const paceSec = Math.floor(paceS % 60).toString().padStart(2, '0');
+            
+            let historicalMsg = `<hr style="border-color: rgba(255,255,255,0.1); margin: 1.5rem 0 1rem 0;">`;
+            historicalMsg += `⏱️ <strong>Passo Stimato (${metricName}):</strong> ${paceMin}:${paceSec} / 500m (con ${avgW} W).<br>`;
+            
+            const titleBase = currentSession.title.replace(/\d+$/, '').trim();
+            const prevSession = ALL_DATA.find(d => new Date(d.date) < new Date(currentSession.date) && d.title.startsWith(titleBase) && d.source === 'smartrower');
+            
+            if (prevSession) {
+                const prevBlocks = prevSession.smartrower.blocks.filter(b => b.target_spm === currentSpm);
+                let prevW = prevSession.avg_power;
+                if (prevBlocks.length > 0) {
+                    prevW = prevBlocks.reduce((acc, b) => acc + b.real_watts * b.duration_min, 0) / prevBlocks.reduce((acc, b) => acc + b.duration_min, 0);
+                }
+                prevW = Math.round(prevW);
+                
+                const prevPaceS = 500 * Math.pow((2.80 / prevW), 1/3);
+                const paceDiff = Math.round(prevPaceS - paceS); 
+                const powerDiff = Math.round(avgW - prevW);
+                const prevDateShort = new Date(prevSession.date).toLocaleDateString('it-IT', {day: '2-digit', month: 'short'});
+                
+                historicalMsg += `<br>📊 <strong>Confronto Storico (${prevDateShort}):</strong> `;
+                if (paceDiff > 0) {
+                    historicalMsg += `Rispetto all'ultima volta, a questa andatura hai guadagnato <strong>${paceDiff} secondi</strong> sul passo (+${powerDiff} W)! Ottimo miglioramento.`;
+                } else if (paceDiff < 0) {
+                    historicalMsg += `Rispetto all'ultima volta, hai perso circa <strong>${Math.abs(paceDiff)} secondi</strong> sul passo (${powerDiff} W). Concentrati sull'allungo.`;
+                } else {
+                    historicalMsg += `Stai mantenendo esattamente la stessa efficienza dell'ultimo allenamento (${avgW} W).`;
+                }
+            } else {
+                historicalMsg += `<br>📊 <em>Questa è la tua prima sessione registrata di tipo "${titleBase}". Dalla prossima vedrai i confronti storici!</em>`;
+            }
+
+            document.getElementById('srForceCoaching').innerHTML = coachMsg + historicalMsg;
+        }
+
+        function renderForceCurveChart(canvasId, force_curves) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            if(window[canvasId+'_obj']) window[canvasId+'_obj'].destroy();
+            
+            const labels = Array.from({length: 60}, (_, i) => (i * 0.05).toFixed(2) + "s");
+
+            window[canvasId+'_obj'] = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Inizio', data: force_curves.start, borderColor: '#10b981', backgroundColor: 'transparent', borderWidth: 2, tension: 0.4, pointRadius: 0 },
+                        { label: 'Centro', data: force_curves.mid, borderColor: '#f59e0b', backgroundColor: 'transparent', borderWidth: 2, tension: 0.4, pointRadius: 0 },
+                        { label: 'Fine', data: force_curves.end, borderColor: '#ef4444', backgroundColor: 'transparent', borderWidth: 2, tension: 0.4, pointRadius: 0 }
+                    ]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { display: true, labels:{color:'#9ca3af'} },
+                        tooltip: { mode: 'index', intersect: false }
+                    }, 
+                    scales: { 
+                        x: { title: {display: true, text: 'Tempo (s)', color: '#9ca3af'}, ticks:{color:'#9ca3af', maxTicksLimit: 10} }, 
+                        y: { title: {display: true, text: 'Forza', color: '#9ca3af'}, grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#9ca3af'} } 
+                    } 
+                }
+            });
+        }
+        
+        function closeModal() {
+            document.getElementById('srModal').style.display = "none";
+        }
+        
+        let srChart1, srChart2, srChart3;
+        function renderModalChart(canvasId, time_s, target, real, label, color, tLabel, rLabel, heartRate = null) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            if(window[canvasId+'_obj']) window[canvasId+'_obj'].destroy();
+            
+            const datasets = [
+                { label: tLabel, data: target, borderColor: 'gray', borderWidth: 2, tension: 0, pointRadius: 0, yAxisID: 'y' },
+                { label: rLabel, data: real, borderColor: color, borderWidth: 1, tension: 0, pointRadius: 0, fill: true, backgroundColor: 'rgba(255, 77, 77, 0.1)', yAxisID: 'y' }
+            ];
+
+            if (heartRate && heartRate.length > 0) {
+                datasets.push({
+                    label: 'Heart Rate (bpm)',
+                    data: heartRate,
+                    borderColor: '#ef4444',
+                    borderWidth: 2,
+                    backgroundColor: 'transparent',
+                    pointRadius: 0,
+                    tension: 0.4,
+                    yAxisID: 'y1'
+                });
+            }
+            
+            window[canvasId+'_obj'] = new Chart(ctx, {
+                type: 'line',
+                data: { labels: time_s, datasets: datasets },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { legend: { display: true, labels:{color:'#fff'} } }, 
+                    scales: { 
+                        x: { display:false }, 
+                        y: { min: 0, grid:{color:'#333'}, ticks:{color:'#fff'}, position: 'left' },
+                        y1: { display: heartRate && heartRate.length > 0, min: 80, max: 200, grid:{drawOnChartArea: false}, ticks:{color:'#ef4444'}, position: 'right' }
+                    } 
+                }
+            });
+        }
+        
+        function renderModalChartStroke(canvasId, time_s, target, stroke_t, stroke_val, label, color, tLabel, rLabel) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            if(window[canvasId+'_obj']) window[canvasId+'_obj'].destroy();
+            
+            // For stroke we use scatter
+            const scatterData = stroke_t.map((t, i) => ({x: t, y: stroke_val[i]}));
+            const lineData = time_s.map((t, i) => ({x: t, y: target[i]}));
+            
+            window[canvasId+'_obj'] = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        { type: 'line', label: tLabel, data: lineData, borderColor: 'gray', borderWidth: 2, pointRadius: 0 },
+                        { type: 'scatter', label: rLabel, data: scatterData, backgroundColor: color, pointRadius: 3 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, labels:{color:'#fff'} } }, scales: { x:{type: 'linear', display:false}, y:{grid:{color:'#333'}, ticks:{color:'#fff'}} } }
+            });
+        }
+
+    </script>
+
+    <!-- SmartRower Advanced Modal -->
+    <div id="srModal" class="sr-modal">
+        <div class="sr-modal-content">
+            <span class="sr-close" onclick="closeModal()">&times;</span>
+            <h2 id="srModalTitle">Dettaglio SmartRower</h2>
+            
+            <div class="sr-modal-grid">
+                <div class="sr-chart-container">
+                    <canvas id="srModalChartPower"></canvas>
+                </div>
+                <div class="sr-chart-container">
+                    <canvas id="srModalChartSPM"></canvas>
+                </div>
+                <div class="sr-chart-container">
+                    <canvas id="srModalChartForce"></canvas>
+                </div>
+            </div>
+
+            <div class="sr-force-curve-section" style="margin-top: 2rem; background: rgba(255,255,255,0.02); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: none;">
+                <h3 style="margin-top:0; margin-bottom:1rem; font-family:var(--font-display); color: #fff;">Evoluzione Curva di Forza</h3>
+                <div id="srForceSpmTabs" style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;"></div>
+                <div id="srForceCoaching" style="font-size: 0.95rem; color: #9ca3af; margin-bottom: 1.5rem; line-height: 1.5;"></div>
+                <div class="sr-chart-container" style="height: 300px;">
+                    <canvas id="srModalChartForceCurve"></canvas>
+                </div>
+            </div>
+
+            <h3 style="margin-top:2rem; margin-bottom:1rem; font-family:var(--font-display);">Analisi Blocchi (Aderenza)</h3>
+            <div style="overflow-x:auto;">
+                <table id="srModalTable" class="sr-table">
+                    <thead>
+                        <tr>
+                            <th>Tempo</th>
+                            <th>Durata</th>
+                            <th>Target W</th>
+                            <th>Real W</th>
+                            <th>Target SPM</th>
+                            <th>Real SPM</th>
+                            <th>Target Forza</th>
+                            <th>Real Peak Forza</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        .sr-modal {
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
+            overflow: auto; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+        }
+        .sr-modal-content {
+            background-color: var(--bg-base); margin: 5% auto; padding: 2rem;
+            border: 1px solid var(--color-accent); border-radius: 12px; width: 90%; max-width: 1200px;
+            box-shadow: 0 0 20px var(--color-accent-glow);
+        }
+        .sr-close {
+            color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;
+        }
+        .sr-close:hover { color: #fff; }
+        .sr-chart-container { height: 250px; width: 100%; margin-bottom: 1rem; }
+        .sr-table { width: 100%; border-collapse: collapse; text-align: left; }
+        .sr-table th, .sr-table td { padding: 12px; border-bottom: 1px solid var(--border-glass); }
+        .sr-table th { color: var(--text-secondary); font-weight: normal; }
+        .sr-table tr:hover { background-color: rgba(255,255,255,0.05); }
+        
+        .badge-smartrower {
+            background-color: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 1px solid #ffc107;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+    </style>
+
+</body>
+</html>

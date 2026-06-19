@@ -1,0 +1,6 @@
+browser_session/
+downloads/
+smartrower_downloads/
+credentials.json
+__pycache__/
+*.pyc
