@@ -7,8 +7,8 @@ const COACH_ANALYSES = {
         nextWorkout: null
     },
     "Aerobic Capacity 2": {
-        theme: "L'Anatomia di un HIIT Perfetto",
-        intro: "",
+        theme: "🔥 Dominio Anaerobico: Oltre i Limiti",
+        intro: "Un HIIT spietato e brutale. Hai affrontato intervalli ad altissima intensità, mettendo alla prova la tua resistenza lattacida e la capacità di recupero. Questa sessione è stata un test incredibile per il tuo sistema neuromuscolare e per la tua tenacia mentale.",
         highlights: [
             {
                 icon: "📈",
@@ -63,20 +63,20 @@ function buildAdviceHTML(workout) {
         return ""; // Se non c'è analisi specifica, non mostriamo nulla (oppure potremmo mostrare un fallback)
     }
 
-    let html = \`
+    let html = `
     <section class="coach-advice-section" style="margin-top: 2rem; background: var(--bg-surface); backdrop-filter: blur(12px); border: 1px solid var(--border-glass); border-radius: 18px; padding: 2rem; box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.15);">
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-glass); padding-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
-            <h2 style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--color-accent); margin: 0;">\${analysisData.theme || 'Analisi Coach'}</h2>
-            <span style="background: rgba(99, 102, 241, 0.2); color: #6366f1; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; white-space: nowrap;">Analisi Workout (\${workout.title})</span>
+            <h2 style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--color-accent); margin: 0;">${analysisData.theme || 'Analisi Coach'}</h2>
+            <span style="background: rgba(99, 102, 241, 0.2); color: #6366f1; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; white-space: nowrap;">Analisi Workout (${workout.title})</span>
         </div>
-    \`;
+    `;
 
     if (analysisData.intro) {
-        html += \`
+        html += `
         <p style="color: var(--text-secondary); font-size: 1.05rem; line-height: 1.6; margin-bottom: 2rem;">
-            \${analysisData.intro}
+            ${analysisData.intro}
         </p>
-        \`;
+        `;
     }
 
     // Stat Cards
@@ -88,93 +88,94 @@ function buildAdviceHTML(workout) {
         if (pf > 0) peakForce = pf;
     }
 
-    html += \`
+    html += `
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2.5rem;">
         <div style="background: rgba(255,255,255,0.03); padding: 1.2rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
             <h4 style="color: #9ca3af; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Battito</h4>
             <div style="display: flex; align-items: baseline; gap: 0.5rem;">
-                <span style="color: #10b981; font-size: 1.6rem; font-weight: 700;">\${workout.avg_hr} bpm</span>
-                <span style="color: #ec4899; font-size: 0.95rem;">(Picco: \${workout.max_hr} bpm)</span>
+                <span style="color: #10b981; font-size: 1.6rem; font-weight: 700;">${workout.avg_hr} bpm</span>
+                <span style="color: #ec4899; font-size: 0.95rem;">(Picco: ${workout.max_hr} bpm)</span>
             </div>
         </div>
         <div style="background: rgba(255,255,255,0.03); padding: 1.2rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
             <h4 style="color: #9ca3af; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Potenza</h4>
             <div style="display: flex; align-items: baseline; gap: 0.5rem;">
-                <span style="color: #3b82f6; font-size: 1.6rem; font-weight: 700;">\${workout.avg_power} W</span>
-                <span style="color: #9ca3af; font-size: 0.95rem;">(Picco: \${workout.max_power} W)</span>
+                <span style="color: #3b82f6; font-size: 1.6rem; font-weight: 700;">${workout.avg_power} W</span>
+                <span style="color: #9ca3af; font-size: 0.95rem;">(Picco: ${workout.max_power} W)</span>
             </div>
         </div>
         <div style="background: rgba(255,255,255,0.03); padding: 1.2rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
             <h4 style="color: #9ca3af; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Cadenza</h4>
             <div style="display: flex; align-items: baseline; gap: 0.5rem;">
-                <span style="color: #f59e0b; font-size: 1.6rem; font-weight: 700;">\${workout.avg_cadence} SPM</span>
-                <span style="color: #9ca3af; font-size: 0.95rem;">(Picco: \${workout.max_cadence} SPM)</span>
+                <span style="color: #f59e0b; font-size: 1.6rem; font-weight: 700;">${workout.avg_cadence} SPM</span>
+                <span style="color: #9ca3af; font-size: 0.95rem;">(Picco: ${workout.max_cadence} SPM)</span>
             </div>
         </div>
         <div style="background: rgba(255,255,255,0.03); padding: 1.2rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
             <h4 style="color: #9ca3af; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Forza Picco</h4>
             <div style="display: flex; align-items: baseline; gap: 0.5rem;">
-                <span style="color: #8b5cf6; font-size: 1.6rem; font-weight: 700;">\${peakForce.toFixed(1)} kgf</span>
+                <span style="color: #8b5cf6; font-size: 1.6rem; font-weight: 700;">${peakForce.toFixed(1)} kgf</span>
             </div>
         </div>
     </div>
-    \`;
+    `;
 
     // Highlights
     if (analysisData.highlights && analysisData.highlights.length > 0) {
-        html += \`<div style="display: flex; flex-direction: column; gap: 2rem;">\`;
+        html += `<div style="display: flex; flex-direction: column; gap: 2rem;">`;
         analysisData.highlights.forEach(hl => {
-            html += \`
+            html += `
             <div>
-                <h3 style="color: #fff; font-size: 1.3rem; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">\${hl.icon} \${hl.title}</h3>
-                <p style="color: var(--text-secondary); line-height: 1.7; font-size: 1.05rem; margin: 0;">\${hl.text}</p>
+                <h3 style="color: #fff; font-size: 1.3rem; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">${hl.icon} ${hl.title}</h3>
+                <p style="color: var(--text-secondary); line-height: 1.7; font-size: 1.05rem; margin: 0;">${hl.text}</p>
             </div>
-            \`;
+            `;
         });
-        html += \`</div>\`;
+        html += `</div>`;
     }
 
     // Detailed Analysis
     if (analysisData.analysis) {
-        html += \`
+        html += `
         <div style="margin-top: 3rem; padding: 2rem; background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.05) 100%); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 16px; position: relative; overflow: hidden;">
             <div style="position: absolute; top: -10px; right: -10px; font-size: 8rem; opacity: 0.05; transform: rotate(15deg); pointer-events: none;">🔥</div>
-            <h3 style="color: #ef4444; margin-bottom: 1rem; font-size: 1.4rem; display: flex; align-items: center; gap: 0.5rem; position: relative; z-index: 1;">\${analysisData.analysis.title}</h3>
+            <h3 style="color: #ef4444; margin-bottom: 1rem; font-size: 1.4rem; display: flex; align-items: center; gap: 0.5rem; position: relative; z-index: 1;">${analysisData.analysis.title}</h3>
             <p style="color: #fff; font-style: normal; line-height: 1.7; font-size: 1.05rem; margin: 0; position: relative; z-index: 1;">
-                \${analysisData.analysis.text}
+                ${analysisData.analysis.text}
             </p>
-        \`;
+        `;
         
         // Next Workout
         if (analysisData.nextWorkout) {
             const nw = analysisData.nextWorkout;
             let barsHtml = "";
-            nw.steps.forEach(s => {
+            nw.steps.forEach((s, index) => {
                 const width = (s.dur / nw.totalDur) * 100;
                 const height = (s.pwr / nw.maxPwr) * 100;
                 const color = getPhaseColor(s.pwr);
-                const title = \`\${s.dur}s @ \${Math.round(s.pwr*100)}% FTP\`;
-                barsHtml += \`<div title="\${title}" style="width: \${width}%; height: \${height}%; background-color: \${color}; opacity: 0.9; border-radius: 2px 2px 0 0;"></div>\`;
+                const title = `${s.dur}s @ ${Math.round(s.pwr*100)}% FTP`;
+                const borderRight = index < nw.steps.length - 1 ? 'border-right: 1px solid rgba(0,0,0,0.3);' : '';
+                barsHtml += `<div title="${title}" style="width: ${width}%; height: ${height}%; background-color: ${color}; opacity: 0.9; border-radius: 2px 2px 0 0; ${borderRight}"></div>`;
             });
 
-            html += \`
-            <div style="margin-top: 2rem; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1.5rem; position: relative; z-index: 1;">
+            html += `
+            <div style="margin-top: 2rem; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1.5rem; position: relative; z-index: 1; width: 100%; box-sizing: border-box;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <h4 style="color: #fff; font-size: 1.2rem; margin: 0 0 0.5rem 0;">\${nw.title}</h4>
-                    <span style="background: rgba(59, 130, 246, 0.2); color: #3b82f6; font-size: 0.8rem; font-weight: bold; padding: 4px 10px; border-radius: 12px; letter-spacing: 1px;">\${nw.type}</span>
+                    <h4 style="color: #fff; font-size: 1.2rem; margin: 0 0 0.5rem 0;">${nw.title}</h4>
+                    <span style="background: rgba(59, 130, 246, 0.2); color: #3b82f6; font-size: 0.8rem; font-weight: bold; padding: 4px 10px; border-radius: 12px; letter-spacing: 1px;">${nw.type}</span>
                 </div>
-                <p style="color: #9ca3af; font-size: 0.95rem; margin: 0 0 1.5rem 0; max-width: 600px;">\${nw.desc}</p>
-                <div style="display: flex; align-items: flex-end; height: 120px; border-bottom: 1px solid rgba(255,255,255,0.2); gap: 1px; padding-bottom: 2px;">
-                    \${barsHtml}
+                <p style="color: #9ca3af; font-size: 0.95rem; margin: 0 0 1.5rem 0;">${nw.desc}</p>
+                <div style="display: flex; align-items: flex-end; height: 120px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 2px; width: 100%; box-sizing: border-box;">
+                    ${barsHtml}
                 </div>
             </div>
-            \`;
+            `;
         }
         
-        html += \`</div>\`; // chiude div margin-top 3rem
+        html += `</div>`; // chiude div margin-top 3rem
     }
 
-    html += \`</section>\`;
+    html += `</section>`;
     return html;
 }
 
