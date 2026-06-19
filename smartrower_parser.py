@@ -9,8 +9,9 @@ import warnings
 warnings.filterwarnings('ignore')
 import re
 
-CSV_DIR = r"C:\Users\stefa\.gemini\antigravity\scratch\exr_analyzer\smartrower_downloads"
-OUT_JS = r"C:\Users\stefa\.gemini\antigravity\scratch\exr_analyzer\smartrower_data.js"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CSV_DIR = os.path.join(BASE_DIR, "smartrower_downloads")
+OUT_JS = os.path.join(BASE_DIR, "smartrower_data.js")
 
 def parse_filename_date(filename):
     # SmartRower_Export_2026-06-04T17-12-48-131Z.csv

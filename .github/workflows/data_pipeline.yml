@@ -1,0 +1,52 @@
+name: Data Pipeline Automation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'downloads/**'
+      - 'smartrower_downloads/**'
+  workflow_dispatch: # Permette di avviarlo anche a mano
+
+jobs:
+  process-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install fitparse pandas numpy scipy playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Run Parsers
+        run: |
+          # Esegue l'analisi per EXR
+          python analyzer.py
+          # Esegue l'analisi per SmartRower
+          python smartrower_parser.py
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data.js smartrower_data.js processed_sessions.json
+          
+          # Se ci sono file modificati, fa il commit e li spinge
+          if git diff --staged --quiet; then
+            echo "Nessuna modifica nei file di output."
+          else
+            git commit -m "Auto-update dati dashboard 🤖"
+            git push
+          fi
