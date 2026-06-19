@@ -1178,11 +1178,11 @@ forceSection.style.display = 'block';
             let priorityCue = "";
             
             // Logica del Cue (Scegliamo il primo problema più grave)
-            if (rfd < (F_peak / 0.4)) { // Se ci mette più di 0.4s a raggiungere il picco
-                priorityCue = "⚠️ <strong>Aggancia la pedana subito all'attacco!</strong><br>La velocità di sviluppo della forza (RFD) è bassa. Devi essere più esplosivo con le gambe all'inizio.";
-            } else if (peak_pos_pct > 0.45) {
+            if (peak_pos_pct > 0.45) {
                 priorityCue = "⚠️ <strong>Anticipa lo sforzo: il massimo va nella prima metà!</strong><br>Stai raggiungendo il picco troppo tardi (" + Math.round(peak_pos_pct*100) + "% della passata). Carica il peso all'inizio.";
-            } else if (fullness < 0.45) {
+            } else if (rfd < (F_peak / 0.6)) { // Se ci mette più di 0.6s a raggiungere il picco
+                priorityCue = "⚠️ <strong>Aggancia la pedana subito all'attacco!</strong><br>La velocità di sviluppo della forza (RFD) è bassa. Devi essere più esplosivo con le gambe all'inizio.";
+            } else if (fullness < 0.42) {
                 priorityCue = "⚠️ <strong>Mantieni la connessione per tutta la passata!</strong><br>La curva è troppo 'a spillo' (Fullness: " + fullness.toFixed(2) + "). Non mollarla dopo il colpo iniziale.";
             } else if (secondary_peaks >= 1) {
                 priorityCue = "⚠️ <strong>Fondi la spinta delle gambe con l'apertura del busto!</strong><br>La curva mostra scossoni (picchi secondari). Il passaggio gambe -> schiena -> braccia non è fluido.";
