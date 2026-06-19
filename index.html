@@ -1126,7 +1126,7 @@
                     tabsContainer.appendChild(btn);
                 });
                 
-                forceSection.style.display = 'block';
+forceSection.style.display = 'block';
                 if(tabsContainer.firstChild) tabsContainer.firstChild.click();
             } else {
                 forceSection.style.display = 'none';
@@ -1134,29 +1134,72 @@
         }
         
         function renderForceCurveBySpm(dataSpm, currentSession, currentSpmStr) {
-            if(!dataSpm || !dataSpm.start || dataSpm.start.length === 0) return;
+            if(!dataSpm || !dataSpm.mid || dataSpm.mid.length === 0) return;
             renderForceCurveChart('srModalChartForceCurve', dataSpm);
             
-            const peakLoc = dataSpm.peak_location_mid;
-            let coachMsg = "";
-            if (peakLoc < 0.4) {
-                coachMsg = "🚀 <strong>Ottimo Catch:</strong> Il picco di forza avviene molto presto (a " + peakLoc + "s). Ottima spinta esplosiva di gambe all'attacco!";
-            } else if (peakLoc > 0.6) {
-                coachMsg = "⚠️ <strong>Spinta Tardiva:</strong> Il picco di forza è ritardato a " + peakLoc + "s. Concentra l'esplosività subito all'attacco premendo forte sui talloni.";
-            } else {
-                coachMsg = "⚖️ <strong>Spinta Bilanciata:</strong> Il picco di forza è centrale (a " + peakLoc + "s). Buona coordinazione generale gambe-schiena-braccia.";
+            const curve = dataSpm.mid;
+            const F_peak = Math.max(...curve);
+            
+            // Trova la fase di drive (forza > 1 kgf)
+            let drive_indices = [];
+            for (let i = 0; i < curve.length; i++) {
+                if (curve[i] > 1.0) drive_indices.push(i);
+            }
+            if (drive_indices.length === 0) return;
+            
+            const t_drive = drive_indices.length * 0.05; // secondi
+            const peak_idx = curve.indexOf(F_peak);
+            const t_peak = peak_idx * 0.05;
+            
+            // F_mean sul drive
+            const drive_forces = drive_indices.map(i => curve[i]);
+            const F_mean = drive_forces.reduce((a, b) => a + b, 0) / drive_forces.length;
+            
+            // Fullness
+            const fullness = F_mean / F_peak;
+            
+            // RFD e Posizione Picco
+            const rfd = t_peak > 0 ? F_peak / t_peak : F_peak;
+            const peak_pos_pct = t_drive > 0 ? (t_peak / t_drive) : 0;
+            
+            // Picchi secondari (ondulazioni)
+            let secondary_peaks = 0;
+            for (let i = peak_idx + 2; i < drive_indices[drive_indices.length - 1]; i++) {
+                if (curve[i] > curve[i-1] && curve[i] > curve[i+1] && curve[i] > 2.0) {
+                    // Controlla la prominence (almeno 1kg di differenza dal minimo precedente locale)
+                    let local_min = curve[i];
+                    for(let j = i-1; j > peak_idx; j--) {
+                        if (curve[j] < local_min) local_min = curve[j];
+                    }
+                    if (curve[i] - local_min > 1.0) secondary_peaks++;
+                }
             }
             
-            const startMax = Math.max(...dataSpm.start);
-            const endMax = Math.max(...dataSpm.end);
-            const drop = Math.round((1 - (endMax / startMax)) * 100);
-            if (drop > 15) {
-                coachMsg += "<br><br>📉 <strong>Fatica Rilevata:</strong> C'è un calo del " + drop + "% del picco di forza a questa andatura verso la fine.";
-            } else if (drop < -10) {
-                coachMsg += "<br><br>📈 <strong>Negative Split:</strong> Ottimo! Hai espresso più forza alla fine che all'inizio a questa andatura.";
+            let priorityCue = "";
+            
+            // Logica del Cue (Scegliamo il primo problema più grave)
+            if (rfd < (F_peak / 0.4)) { // Se ci mette più di 0.4s a raggiungere il picco
+                priorityCue = "⚠️ <strong>Aggancia la pedana subito all'attacco!</strong><br>La velocità di sviluppo della forza (RFD) è bassa. Devi essere più esplosivo con le gambe all'inizio.";
+            } else if (peak_pos_pct > 0.45) {
+                priorityCue = "⚠️ <strong>Anticipa lo sforzo: il massimo va nella prima metà!</strong><br>Stai raggiungendo il picco troppo tardi (" + Math.round(peak_pos_pct*100) + "% della passata). Carica il peso all'inizio.";
+            } else if (fullness < 0.45) {
+                priorityCue = "⚠️ <strong>Mantieni la connessione per tutta la passata!</strong><br>La curva è troppo 'a spillo' (Fullness: " + fullness.toFixed(2) + "). Non mollarla dopo il colpo iniziale.";
+            } else if (secondary_peaks >= 1) {
+                priorityCue = "⚠️ <strong>Fondi la spinta delle gambe con l'apertura del busto!</strong><br>La curva mostra scossoni (picchi secondari). Il passaggio gambe -> schiena -> braccia non è fluido.";
             } else {
-                coachMsg += "<br><br>🔋 <strong>Costanza:</strong> Ottima tenuta muscolare, le curve sono molto simili tra inizio e fine allenamento a questa andatura.";
+                priorityCue = "🎯 <strong>Curva di forza eccellente!</strong><br>Ottima connessione, picco nella prima metà e rilascio fluido. Stai vogando in modo eccezionalmente efficiente.";
             }
+            
+            const statsHtml = `
+                <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; font-size: 0.85rem; color: #9ca3af;">
+                    <span class="badge-smartrower" style="color: #3b82f6; border-color: #3b82f6;">Picco: ${F_peak.toFixed(1)} kgf</span>
+                    <span class="badge-smartrower" style="color: #10b981; border-color: #10b981;">Fullness (Φ): ${fullness.toFixed(2)}</span>
+                    <span class="badge-smartrower" style="color: #f59e0b; border-color: #f59e0b;">Pos. Picco: ${Math.round(peak_pos_pct*100)}%</span>
+                    <span class="badge-smartrower" style="color: #ec4899; border-color: #ec4899;">RFD: ${rfd.toFixed(1)} kg/s</span>
+                </div>
+            `;
+
+            let coachMsg = priorityCue + statsHtml;
             
             // Pace & Historical Comparison
             const currentSpm = parseInt(currentSpmStr);

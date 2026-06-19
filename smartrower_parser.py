@@ -87,10 +87,18 @@ def process_smartrower_csv(filepath):
         peak_forces.append(chunk['real_force'].max())
         avg_watts_stroke.append(chunk['real_watts'].mean())
 
-    # --- Extract Full Stroke Force Curves (Catch to Catch - 0.5s) ---
+    # --- Extract Full Stroke Force Curves (Catch to Catch) using Robust Detection ---
     curves_by_spm = {}
-    force_gt_1 = (df['real_force'] > 1.0).astype(int)
-    catch_indices = np.where(force_gt_1.diff() == 1)[0].tolist()
+    
+    # Trova i veri picchi di forza per evitare falsi catch dovuti a rumore attorno a 1.0kg
+    f_peaks, _ = find_peaks(df['real_force'].values, distance=100, prominence=5, height=10)
+    catch_indices = []
+    for p in f_peaks:
+        c = p
+        while c > 0 and df['real_force'].iloc[c] > 1.0:
+            c -= 1
+        if len(catch_indices) == 0 or c - catch_indices[-1] > 100:
+            catch_indices.append(c)
 
     for i in range(1, len(catch_indices)-1):
         catch_idx = catch_indices[i]
