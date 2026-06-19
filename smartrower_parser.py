@@ -89,6 +89,7 @@ def process_smartrower_csv(filepath):
 
     # --- Extract Full Stroke Force Curves (Catch to Catch) using Robust Detection ---
     curves_by_spm = {}
+    catch_factors_by_spm = {}
     
     # Trova i veri picchi di forza per evitare falsi catch dovuti a rumore attorno a 1.0kg
     f_peaks, _ = find_peaks(df['real_force'].values, distance=100, prominence=5, height=10)
@@ -117,8 +118,29 @@ def process_smartrower_csv(filepath):
         if t_spm > 0:
             if t_spm not in curves_by_spm:
                 curves_by_spm[t_spm] = []
+                catch_factors_by_spm[t_spm] = []
                 
             y = chunk['real_force'].values
+            
+            # Estrazione Catch Factor
+            if 'seat_pos' in df.columns and 'cord_pos' in df.columns:
+                w_start = max(0, catch_idx - 50)
+                w_end = min(len(df), catch_idx + 50)
+                if w_end > w_start:
+                    seat_window = df['seat_pos'].iloc[w_start:w_end].values
+                    cord_window = df['cord_pos'].iloc[w_start:w_end].values
+                    time_window = df['time_ms'].iloc[w_start:w_end].values
+                    
+                    if (seat_window.max() - seat_window.min()) > 0.05 and (cord_window.max() - cord_window.min()) > 0.001:
+                        seat_min_idx = np.argmin(seat_window)
+                        cord_min_val = cord_window.min()
+                        min_indices = np.where(cord_window <= cord_min_val + 0.001)[0]
+                        if len(min_indices) > 0:
+                            cord_min_idx = min_indices[-1]
+                            t_seat = time_window[seat_min_idx]
+                            t_cord = time_window[cord_min_idx]
+                            catch_factors_by_spm[t_spm].append(float(t_seat - t_cord))
+
             if len(y) > 0:
                 if len(y) < 300:
                     y = np.pad(y, (0, 300 - len(y)), 'constant', constant_values=0)
@@ -152,11 +174,16 @@ def process_smartrower_csv(filepath):
             mid = np.mean(c2, axis=0).round(2).tolist() if len(c2)>0 else []
             peak_loc = round(np.argmax(mid) * 0.05, 2) if len(mid) > 0 else 0
             
+            cf_median = None
+            if t_spm in catch_factors_by_spm and len(catch_factors_by_spm[t_spm]) > 0:
+                cf_median = float(np.median(catch_factors_by_spm[t_spm]))
+            
             force_curves_export[str(t_spm)] = {
                 "start": np.mean(c1, axis=0).round(2).tolist() if len(c1)>0 else [],
                 "mid": mid,
                 "end": np.mean(c3, axis=0).round(2).tolist() if len(c3)>0 else [],
-                "peak_location_mid": peak_loc
+                "peak_location_mid": peak_loc,
+                "catch_factor_ms": round(cf_median, 1) if cf_median is not None else None
             }
 
     strokes_df = pd.DataFrame({'block_id': stroke_blocks, 'spm': spm, 'peak_force': peak_forces})

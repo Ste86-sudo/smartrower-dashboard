@@ -1182,8 +1182,19 @@ forceSection.style.display = 'block';
             let priorityCue = "";
             
             // Logica del Cue (Scegliamo il primo problema più grave)
-            if (peak_pos_pct > 0.42) {
-                priorityCue = "⚠️ <strong>Anticipa lo sforzo: il massimo va nella prima metà!</strong><br>Stai raggiungendo il picco troppo tardi (" + Math.round(peak_pos_pct*100) + "% della passata). Carica il peso all'inizio.";
+            // 1. Catch Factor (Timing Iniziale) ha priorità assoluta se disponibile
+            const cf = dataSpm.catch_factor_ms;
+            if (cf !== undefined && cf !== null) {
+                if (cf > 0) {
+                    priorityCue = "⚠️ <strong>Inverti la direzione attaccando!</strong><br>Non aspettare di essere fermo. Il manubrio è in ritardo rispetto al sedile (" + Math.round(cf) + " ms). Perdi il pre-carico elastico.";
+                } else if (cf < -50) {
+                    priorityCue = "⚠️ <strong>Frena la slitta!</strong><br>Il sedile scappa via prima di caricare (Catch Factor: " + Math.round(cf) + " ms). Le gambe partono a vuoto senza spostare il manubrio.";
+                }
+            }
+            
+            if (priorityCue === "") {
+                if (peak_pos_pct > 0.42) {
+                    priorityCue = "⚠️ <strong>Anticipa lo sforzo: il massimo va nella prima metà!</strong><br>Stai raggiungendo il picco troppo tardi (" + Math.round(peak_pos_pct*100) + "% della passata). Carica il peso all'inizio.";
             } else if (rfd < 60.0) { // RFD sotto 60 kg/s è considerato lento per questo ergometro
                 priorityCue = "⚠️ <strong>Aggancia la pedana subito all'attacco!</strong><br>La velocità di sviluppo della forza (RFD) è bassa (" + Math.round(rfd) + " kg/s). Devi essere più esplosivo con le gambe all'inizio.";
             } else if (fullness < 0.52) {
@@ -1193,6 +1204,7 @@ forceSection.style.display = 'block';
             } else {
                 priorityCue = "🎯 <strong>Curva di forza eccellente!</strong><br>Ottima connessione, picco nella prima metà e rilascio fluido. Stai vogando in modo eccezionalmente efficiente.";
             }
+            } // Close the if (priorityCue === "") block
             
             const statsHtml = `
                 <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; font-size: 0.85rem; color: #9ca3af;">
@@ -1200,6 +1212,7 @@ forceSection.style.display = 'block';
                     <span class="badge-smartrower" style="color: #10b981; border-color: #10b981;">Fullness (Φ): ${fullness.toFixed(2)}</span>
                     <span class="badge-smartrower" style="color: #f59e0b; border-color: #f59e0b;">Pos. Picco: ${Math.round(peak_pos_pct*100)}%</span>
                     <span class="badge-smartrower" style="color: #ec4899; border-color: #ec4899;">RFD: ${rfd.toFixed(1)} kg/s</span>
+                    ${cf !== undefined && cf !== null ? `<span class="badge-smartrower" style="color: #8b5cf6; border-color: #8b5cf6;">Catch Factor: ${Math.round(cf)} ms</span>` : ''}
                 </div>
             `;
 
