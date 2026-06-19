@@ -728,6 +728,23 @@
                     else if (w.duration_min >= 15) title = `EXR | Fondo Aerobico ${(w.distance_m/1000).toFixed(1)}K`;
                     else title = `EXR | Rowing Session ${(w.distance_m/1000).toFixed(2)} km`;
                 }
+                
+                let vo2Html = '';
+                if (w.avg_hr > 60 && w.avg_power > 50) {
+                    const hrRest = 55;
+                    const hrMax = 181; // Dal profilo
+                    const weight = 78; // kg stimato
+                    let estMaxPower = w.avg_power;
+                    if (w.avg_hr < hrMax) {
+                        estMaxPower = w.avg_power * ((hrMax - hrRest) / (w.avg_hr - hrRest));
+                    }
+                    const vo2max = ((estMaxPower * 10.8) / weight) + 3.5;
+                    vo2Html = `
+                                <div class="card-stat">
+                                    <span class="card-stat-label" style="color: #10b981;">VO2Max Est.</span>
+                                    <span class="card-stat-value">${vo2max.toFixed(1)}<span class="card-stat-unit">ml/kg</span></span>
+                                </div>`;
+                }
 
                 card.innerHTML = `
                     <div class="workout-card-grid">
@@ -768,6 +785,7 @@
                                     <span class="card-stat-label">Energia</span>
                                     <span class="card-stat-value">${w.calories}<span class="card-stat-unit">kcal</span></span>
                                 </div>
+                                ${vo2Html}
                             </div>
 
                             <div class="insight-block">
