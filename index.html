@@ -1147,9 +1147,12 @@ forceSection.style.display = 'block';
             }
             if (drive_indices.length === 0) return;
             
+            const drive_start_idx = drive_indices[0];
             const t_drive = drive_indices.length * 0.05; // secondi
             const peak_idx = curve.indexOf(F_peak);
-            const t_peak = peak_idx * 0.05;
+            
+            // t_peak deve essere calcolato dall'inizio del drive (drive_start_idx), non dall'inizio dell'array
+            const t_peak = Math.max(0, (peak_idx - drive_start_idx)) * 0.05;
             
             // F_mean sul drive
             const drive_forces = drive_indices.map(i => curve[i]);
