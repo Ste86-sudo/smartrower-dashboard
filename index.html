@@ -1140,10 +1140,11 @@ forceSection.style.display = 'block';
             const curve = dataSpm.mid;
             const F_peak = Math.max(...curve);
             
-            // Trova la fase di drive (forza > 1 kgf)
+            // Trova la fase di drive ignorando la tensione di ritorno dell'elastico (bungee cord, ~2-3kg)
+            const threshold = Math.max(4.0, F_peak * 0.1);
             let drive_indices = [];
             for (let i = 0; i < curve.length; i++) {
-                if (curve[i] > 1.0) drive_indices.push(i);
+                if (curve[i] > threshold) drive_indices.push(i);
             }
             if (drive_indices.length === 0) return;
             
@@ -1183,7 +1184,7 @@ forceSection.style.display = 'block';
             // Logica del Cue (Scegliamo il primo problema più grave)
             if (peak_pos_pct > 0.45) {
                 priorityCue = "⚠️ <strong>Anticipa lo sforzo: il massimo va nella prima metà!</strong><br>Stai raggiungendo il picco troppo tardi (" + Math.round(peak_pos_pct*100) + "% della passata). Carica il peso all'inizio.";
-            } else if (rfd < (F_peak / 0.6)) { // Se ci mette più di 0.6s a raggiungere il picco
+            } else if (t_peak > 0.8) { // Sostituito rfd assoluto con un tempo molto rilassato
                 priorityCue = "⚠️ <strong>Aggancia la pedana subito all'attacco!</strong><br>La velocità di sviluppo della forza (RFD) è bassa. Devi essere più esplosivo con le gambe all'inizio.";
             } else if (fullness < 0.42) {
                 priorityCue = "⚠️ <strong>Mantieni la connessione per tutta la passata!</strong><br>La curva è troppo 'a spillo' (Fullness: " + fullness.toFixed(2) + "). Non mollarla dopo il colpo iniziale.";
