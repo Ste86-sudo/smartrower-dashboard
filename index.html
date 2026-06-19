@@ -955,6 +955,7 @@
                             ticks: { color: '#9ca3af', font: { family: 'Inter', size: 10 } }
                         },
                         y: {
+                            min: 0,
                             grid: { color: 'rgba(255, 255, 255, 0.05)' },
                             ticks: { color: '#9ca3af', font: { family: 'Inter', size: 10 } }
                         }
@@ -1006,11 +1007,13 @@
                             ticks: { color: '#9ca3af', font: { family: 'Inter', size: 10 } }
                         },
                         y: {
+                            min: 0,
                             position: 'left',
                             grid: { color: 'rgba(255, 255, 255, 0.05)' },
                             ticks: { color: '#06b6d4', font: { family: 'Inter', size: 10 } }
                         },
                         y1: {
+                            min: 0,
                             position: 'right',
                             grid: { drawOnChartArea: false },
                             ticks: { color: '#10b981', font: { family: 'Inter', size: 10 } }
@@ -1293,7 +1296,7 @@
                         { type: 'scatter', label: rLabel, data: scatterData, backgroundColor: color, pointRadius: 3 }
                     ]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, labels:{color:'#fff'} } }, scales: { x:{type: 'linear', display:false}, y:{grid:{color:'#333'}, ticks:{color:'#fff'}} } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, labels:{color:'#fff'} } }, scales: { x:{type: 'linear', display:false}, y:{min: 0, grid:{color:'#333'}, ticks:{color:'#fff'}} } }
             });
         }
 
