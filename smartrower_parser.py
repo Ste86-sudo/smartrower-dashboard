@@ -483,10 +483,13 @@ def process_smartrower_csv(filepath):
     total_work_J = 0
     for i in range(len(peaks)-1):
         dt_s = df['time_s'].iloc[peaks[i+1]] - df['time_s'].iloc[peaks[i]]
-        p = stroke_power_theo[i]
+        # Usiamo i real_watts corretti invece di quelli puramente teorici, così se c'è
+        # il fix ERG (o se usiamo quelli veri del CSV), calorie e distanza tornano.
+        p = df['real_watts'].iloc[peaks[i]:peaks[i+1]].mean()
         if dt_s > 0 and p > 0:
             total_distance_m += dt_s * (p / 2.80) ** (1.0/3.0)
             total_work_J += p * dt_s
+            
     # Calorie: efficienza meccanica ~25%
     total_calories = total_work_J / 0.25 / 4186
     
