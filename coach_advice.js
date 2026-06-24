@@ -1,4 +1,37 @@
 const COACH_ANALYSES = {
+    "Aerobic Capacity 6": {
+        theme: "👑 L'Apoteosi del Lattato: Sforzo Massimale",
+        intro: "Questa sessione è stata un'escalation chirurgica. Hai affrontato tre blocchi a piramide arrivando ogni volta a sfiorare i tuoi limiti, con una precisione millimetrica sui wattaggi richiesti.",
+        highlights: [
+            {
+                icon: "🎯",
+                title: "1. Precisione Svizzera sui 230W",
+                text: "Nei tre picchi a 230 Watt hai registrato rispettivamente <strong>231.7W</strong>, <strong>232.2W</strong> e <strong>229.0W</strong>. Aver tenuto una deviazione inferiore all'1% dal target, mentre il corpo urla pietà sotto acido lattico, dimostra una propriocezione e un controllo della potenza eccezionali."
+            },
+            {
+                icon: "❤️",
+                title: "2. Il Picco a 179 bpm (La Redline)",
+                text: "Nell'ultimo feroce blocco di 2 minuti a 230W (tirato a 28 SPM), il tuo cuore ha toccato i <strong>179 bpm</strong>. Considerando che il tuo massimale teorico è 181, hai letteralmente lavorato al 99% delle tue capacità cardiache. Sei entrato nella <em>Redline</em>, la zona dove il corpo subisce lo stimolo più brutale per l'adattamento del VO2Max."
+            }
+        ],
+        analysis: {
+            title: "🧬 Analisi: Aerobic Capacity 6 (La gestione del recupero)",
+            text: `Questo allenamento mostra l'importanza di analizzare i dati a blocchi. Guardiamo cosa è successo nei tuoi recuperi (i blocchi da 8 minuti a 160W).<br><br>
+                   Nel primo recupero il tuo cuore è sceso a <strong>154 bpm</strong>. Nel secondo recupero è sceso solo a <strong>161 bpm</strong>. Questa si chiama <em>deriva cardiaca</em>: il tuo corpo stava perdendo efficienza nel dissipare il calore e smaltire i metaboliti. <br><br>
+                   Quando poi è arrivato l'ultimo blocco (230W a 28 SPM), sei dovuto salire di colpi (da 26 a 28 SPM) per mantenere la stessa potenza, e la tua forza media di picco è leggermente calata (da 57.9 a 57.1 kgf). Il muscolo era vuoto, ma hai compensato con il fiato e la velocità. È un perfetto esempio di come la cadenza salva l'allenamento quando la forza muscolare pura viene a mancare.<br><br>
+                   <strong>Il Prossimo Step:</strong> Dopo aver toccato il 99% della tua Frequenza Cardiaca Massima, il tuo sistema nervoso centrale è "fritto". Hai assolutamente bisogno di ricostruire le scorte e riposare. Il prossimo allenamento deve essere un defaticamento totale in Zona 1/2.`
+        },
+        nextWorkout: {
+            title: "Recovery Row",
+            type: "ACTIVE RECOVERY",
+            desc: "Sessione di recupero attivo per lavare via l'acido lattico e abbassare il cortisolo. Frequenza cardiaca da tenere sotto i 125 bpm.",
+            steps: [
+                {"dur": 1800, "pwr": 0.5}
+            ],
+            maxPwr: 0.5,
+            totalDur: 1800
+        }
+    },
     "Regeneration training 4": {
         theme: "Maestria Aerobica: Il Potere del Recupero Attivo",
         intro: "Hai eseguito alla lettera il protocollo di scarico che avevamo pianificato. Dopo il massacro dei 10.4km di ieri, hai abbassato l'ego, hai rallentato la macchina e ti sei concentrato sull'efficienza. Questa sessione è un capolavoro di disciplina neuromuscolare.",
