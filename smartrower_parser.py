@@ -391,9 +391,12 @@ def process_smartrower_csv(filepath):
     block_reals = strokes_df.groupby('block_id').agg({'spm': 'mean', 'peak_force': 'mean'})
     block_reals.columns = ['real_spm', 'real_peak_force']
     
-    # --- FIX SPECIFICO PER "Aerobic Capacity 2" ---
-    if "Aerobic Capacity 2" in metadata['title']:
-        print("Applicazione fix potenza da forza di picco per Aerobic Capacity 2...")
+    # --- FIX POTENZA (ERG MODE / CORD_BROKEN) ---
+    # Dato che target_watts = target_force * (costante, di solito ~4.0)
+    # Se il sensore di distanza è rotto, ricalcoliamo i real_watts linearmente basandoci sul rapporto tra
+    # real_peak_force e target_force per garantire la coerenza con le aspettative dell'utente.
+    if cord_broken:
+        print("  Applicazione fix potenza lineare basato su real_peak_force...")
         df['real_watts'] = 0.0
         for i in range(len(peaks)-1):
             start_idx = peaks[i]
@@ -401,10 +404,14 @@ def process_smartrower_csv(filepath):
             t_w = df['target_watts'].iloc[start_idx]
             t_f = df['target_force'].iloc[start_idx]
             r_pf = df['real_force'].iloc[start_idx:end_idx].max()
-            if t_f > 0:
+            if t_f > 0 and t_w > 0:
+                # Applica il ratio del blocco corrente
                 df.loc[start_idx:end_idx, 'real_watts'] = t_w * (r_pf / t_f)
+            else:
+                # Fallback: ratio standard di 4.0 se non ci sono target
+                df.loc[start_idx:end_idx, 'real_watts'] = r_pf * 4.0
                 
-        # Re-calculate stroke avg_watts just in case
+        # Ricalcola la media dei watts per vogata
         avg_watts_stroke = []
         for i in range(len(peaks)-1):
             start_idx = peaks[i]
