@@ -735,15 +735,36 @@
                     const hrRest = 55;
                     const hrMax = 181; // Dal profilo
                     const weight = 78; // kg stimato
-                    let estMaxPower = w.avg_power;
-                    if (w.avg_hr < hrMax) {
-                        estMaxPower = w.avg_power * ((hrMax - hrRest) / (w.avg_hr - hrRest));
+                    
+                    let hrForCalc = w.avg_hr;
+                    let powerForCalc = w.avg_power;
+                    
+                    // Se abbiamo l'analisi a blocchi, troviamo il blocco più intenso (es. intervallo duro)
+                    // per evitare che i recuperi a bassi watt abbattano il calcolo del VO2Max.
+                    if (isSmartRower && w.smartrower && w.smartrower.blocks) {
+                        let maxBlockPower = 0;
+                        let maxBlockHr = 0;
+                        for (let b of w.smartrower.blocks) {
+                            if (b.real_watts > maxBlockPower && b.real_hr > 100) {
+                                maxBlockPower = b.real_watts;
+                                maxBlockHr = b.real_hr;
+                            }
+                        }
+                        if (maxBlockPower > 50 && maxBlockHr > 100) {
+                            powerForCalc = maxBlockPower;
+                            hrForCalc = maxBlockHr;
+                        }
+                    }
+                    
+                    let estMaxPower = powerForCalc;
+                    if (hrForCalc < hrMax) {
+                        estMaxPower = powerForCalc * ((hrMax - hrRest) / (hrForCalc - hrRest));
                     }
                     const vo2max = ((estMaxPower * 10.8) / weight) + 3.5;
                     vo2Html = `
                                 <div class="card-stat">
                                     <span class="card-stat-label" style="color: #10b981;">VO2Max Est.</span>
-                                    <span class="card-stat-value">${vo2max.toFixed(1)}<span class="card-stat-unit">ml/kg</span></span>
+                                    <span class="card-stat-value" title="Calcolato su ${Math.round(powerForCalc)}W a ${Math.round(hrForCalc)} bpm">${vo2max.toFixed(1)}<span class="card-stat-unit">ml/kg</span></span>
                                 </div>`;
                 }
 

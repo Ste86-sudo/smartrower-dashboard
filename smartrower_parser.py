@@ -439,6 +439,7 @@ def process_smartrower_csv(filepath):
         # Find real watts for this block
         block_sec = df_sec[(df_sec['sec_idx'] >= row['time_start']) & (df_sec['sec_idx'] <= row['time_end'])]
         real_w = block_sec['real_watts'].mean() if len(block_sec) > 0 else 0
+        real_hr = block_sec['heart_rate'].mean() if len(block_sec) > 0 and 'heart_rate' in block_sec.columns else 0
         
         blocks_out.append({
             "time": f"{int(row['time_start']/60):02d}:{int(row['time_start']%60):02d} - {int(row['time_end']/60):02d}:{int(row['time_end']%60):02d}",
@@ -448,7 +449,8 @@ def process_smartrower_csv(filepath):
             "target_spm": float(row['target_spm']),
             "real_spm": round(row['real_spm'], 1) if pd.notnull(row['real_spm']) else 0,
             "target_force": float(row['target_force']),
-            "real_peak_force": round(row['real_peak_force'], 1) if pd.notnull(row['real_peak_force']) else 0
+            "real_peak_force": round(row['real_peak_force'], 1) if pd.notnull(row['real_peak_force']) else 0,
+            "real_hr": int(round(real_hr)) if pd.notnull(real_hr) else 0
         })
 
     # Subsample data for frontend charts (max ~500 points for real watts)

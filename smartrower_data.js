@@ -26,7 +26,8 @@ const SMARTROWER_DATA = [
           "target_spm": 20.0,
           "real_spm": 20.2,
           "target_force": 35.0,
-          "real_peak_force": 39.2
+          "real_peak_force": 39.2,
+          "real_hr": 114
         },
         {
           "time": "03:59 - 07:57",
@@ -36,7 +37,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 22.3,
           "target_force": 40.0,
-          "real_peak_force": 43.3
+          "real_peak_force": 43.3,
+          "real_hr": 135
         },
         {
           "time": "07:58 - 09:56",
@@ -46,7 +48,8 @@ const SMARTROWER_DATA = [
           "target_spm": 24.0,
           "real_spm": 24.4,
           "target_force": 47.5,
-          "real_peak_force": 49.0
+          "real_peak_force": 49.0,
+          "real_hr": 150
         },
         {
           "time": "09:57 - 11:55",
@@ -56,7 +59,8 @@ const SMARTROWER_DATA = [
           "target_spm": 26.0,
           "real_spm": 26.5,
           "target_force": 57.5,
-          "real_peak_force": 57.9
+          "real_peak_force": 57.9,
+          "real_hr": 163
         },
         {
           "time": "11:56 - 19:54",
@@ -66,7 +70,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 22.2,
           "target_force": 40.0,
-          "real_peak_force": 42.8
+          "real_peak_force": 42.8,
+          "real_hr": 154
         },
         {
           "time": "19:55 - 21:53",
@@ -76,7 +81,8 @@ const SMARTROWER_DATA = [
           "target_spm": 24.0,
           "real_spm": 24.3,
           "target_force": 47.5,
-          "real_peak_force": 48.8
+          "real_peak_force": 48.8,
+          "real_hr": 161
         },
         {
           "time": "21:54 - 23:52",
@@ -86,7 +92,8 @@ const SMARTROWER_DATA = [
           "target_spm": 26.0,
           "real_spm": 26.4,
           "target_force": 57.5,
-          "real_peak_force": 57.9
+          "real_peak_force": 57.9,
+          "real_hr": 170
         },
         {
           "time": "23:53 - 31:51",
@@ -96,7 +103,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 22.2,
           "target_force": 40.0,
-          "real_peak_force": 42.2
+          "real_peak_force": 42.2,
+          "real_hr": 161
         },
         {
           "time": "31:52 - 33:50",
@@ -106,7 +114,8 @@ const SMARTROWER_DATA = [
           "target_spm": 26.0,
           "real_spm": 26.4,
           "target_force": 47.5,
-          "real_peak_force": 50.9
+          "real_peak_force": 50.9,
+          "real_hr": 171
         },
         {
           "time": "33:51 - 35:50",
@@ -116,7 +125,8 @@ const SMARTROWER_DATA = [
           "target_spm": 28.0,
           "real_spm": 28.4,
           "target_force": 57.5,
-          "real_peak_force": 57.1
+          "real_peak_force": 57.1,
+          "real_hr": 179
         },
         {
           "time": "35:50 - 43:48",
@@ -126,7 +136,8 @@ const SMARTROWER_DATA = [
           "target_spm": 20.0,
           "real_spm": 20.2,
           "target_force": 37.5,
-          "real_peak_force": 39.6
+          "real_peak_force": 39.6,
+          "real_hr": 159
         }
       ],
       "chart": {
@@ -7275,7 +7286,8 @@ const SMARTROWER_DATA = [
           "target_spm": 20.0,
           "real_spm": 20.2,
           "target_force": 35.0,
-          "real_peak_force": 38.3
+          "real_peak_force": 38.3,
+          "real_hr": 107
         },
         {
           "time": "03:59 - 04:57",
@@ -7285,7 +7297,8 @@ const SMARTROWER_DATA = [
           "target_spm": 26.0,
           "real_spm": 27.2,
           "target_force": 62.5,
-          "real_peak_force": 62.8
+          "real_peak_force": 62.8,
+          "real_hr": 138
         },
         {
           "time": "04:58 - 11:56",
@@ -7295,7 +7308,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 22.2,
           "target_force": 40.0,
-          "real_peak_force": 42.9
+          "real_peak_force": 42.9,
+          "real_hr": 142
         },
         {
           "time": "11:57 - 12:55",
@@ -7305,7 +7319,8 @@ const SMARTROWER_DATA = [
           "target_spm": 26.0,
           "real_spm": 26.9,
           "target_force": 62.5,
-          "real_peak_force": 61.5
+          "real_peak_force": 61.5,
+          "real_hr": 155
         },
         {
           "time": "12:56 - 19:54",
@@ -7315,7 +7330,8 @@ const SMARTROWER_DATA = [
           "target_spm": 20.0,
           "real_spm": 20.3,
           "target_force": 40.0,
-          "real_peak_force": 40.8
+          "real_peak_force": 40.8,
+          "real_hr": 142
         },
         {
           "time": "19:55 - 20:17",
@@ -7325,7 +7341,8 @@ const SMARTROWER_DATA = [
           "target_spm": 28.0,
           "real_spm": 28.5,
           "target_force": 67.5,
-          "real_peak_force": 62.7
+          "real_peak_force": 62.7,
+          "real_hr": 145
         },
         {
           "time": "20:18 - 27:52",
@@ -7335,7 +7352,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 22.2,
           "target_force": 35.0,
-          "real_peak_force": 39.4
+          "real_peak_force": 39.4,
+          "real_hr": 145
         }
       ],
       "chart": {
@@ -13338,7 +13356,8 @@ const SMARTROWER_DATA = [
           "target_spm": 20.0,
           "real_spm": 20.2,
           "target_force": 35.0,
-          "real_peak_force": 38.1
+          "real_peak_force": 38.1,
+          "real_hr": 114
         },
         {
           "time": "05:00 - 24:59",
@@ -13348,7 +13367,8 @@ const SMARTROWER_DATA = [
           "target_spm": 20.0,
           "real_spm": 20.1,
           "target_force": 40.0,
-          "real_peak_force": 40.9
+          "real_peak_force": 40.9,
+          "real_hr": 131
         },
         {
           "time": "25:00 - 29:59",
@@ -13358,7 +13378,8 @@ const SMARTROWER_DATA = [
           "target_spm": 20.0,
           "real_spm": 20.1,
           "target_force": 35.0,
-          "real_peak_force": 38.3
+          "real_peak_force": 38.3,
+          "real_hr": 132
         }
       ],
       "chart": {
@@ -19022,7 +19043,8 @@ const SMARTROWER_DATA = [
           "target_spm": 20.0,
           "real_spm": 21.1,
           "target_force": 35.0,
-          "real_peak_force": 37.2
+          "real_peak_force": 37.2,
+          "real_hr": 0
         },
         {
           "time": "03:59 - 07:57",
@@ -19032,7 +19054,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 22.3,
           "target_force": 40.0,
-          "real_peak_force": 42.4
+          "real_peak_force": 42.4,
+          "real_hr": 0
         },
         {
           "time": "07:58 - 09:56",
@@ -19042,7 +19065,8 @@ const SMARTROWER_DATA = [
           "target_spm": 24.0,
           "real_spm": 24.4,
           "target_force": 47.5,
-          "real_peak_force": 48.9
+          "real_peak_force": 48.9,
+          "real_hr": 0
         },
         {
           "time": "09:57 - 11:55",
@@ -19052,7 +19076,8 @@ const SMARTROWER_DATA = [
           "target_spm": 26.0,
           "real_spm": 26.5,
           "target_force": 57.5,
-          "real_peak_force": 58.1
+          "real_peak_force": 58.1,
+          "real_hr": 0
         },
         {
           "time": "11:56 - 19:54",
@@ -19062,7 +19087,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 22.2,
           "target_force": 40.0,
-          "real_peak_force": 42.3
+          "real_peak_force": 42.3,
+          "real_hr": 0
         },
         {
           "time": "19:55 - 21:53",
@@ -19072,7 +19098,8 @@ const SMARTROWER_DATA = [
           "target_spm": 24.0,
           "real_spm": 24.3,
           "target_force": 47.5,
-          "real_peak_force": 48.2
+          "real_peak_force": 48.2,
+          "real_hr": 0
         },
         {
           "time": "21:54 - 23:52",
@@ -19082,7 +19109,8 @@ const SMARTROWER_DATA = [
           "target_spm": 26.0,
           "real_spm": 26.3,
           "target_force": 57.5,
-          "real_peak_force": 56.0
+          "real_peak_force": 56.0,
+          "real_hr": 0
         },
         {
           "time": "23:53 - 31:51",
@@ -19092,7 +19120,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 22.4,
           "target_force": 40.0,
-          "real_peak_force": 42.3
+          "real_peak_force": 42.3,
+          "real_hr": 0
         },
         {
           "time": "31:52 - 33:51",
@@ -19102,7 +19131,8 @@ const SMARTROWER_DATA = [
           "target_spm": 26.0,
           "real_spm": 26.4,
           "target_force": 47.5,
-          "real_peak_force": 49.8
+          "real_peak_force": 49.8,
+          "real_hr": 0
         },
         {
           "time": "33:51 - 35:49",
@@ -19112,7 +19142,8 @@ const SMARTROWER_DATA = [
           "target_spm": 28.0,
           "real_spm": 28.2,
           "target_force": 57.5,
-          "real_peak_force": 57.2
+          "real_peak_force": 57.2,
+          "real_hr": 0
         },
         {
           "time": "35:50 - 43:48",
@@ -19122,7 +19153,8 @@ const SMARTROWER_DATA = [
           "target_spm": 20.0,
           "real_spm": 20.1,
           "target_force": 37.5,
-          "real_peak_force": 40.0
+          "real_peak_force": 40.0,
+          "real_hr": 0
         }
       ],
       "chart": {
@@ -26226,7 +26258,8 @@ const SMARTROWER_DATA = [
           "target_spm": 20.0,
           "real_spm": 20.4,
           "target_force": 35.0,
-          "real_peak_force": 39.2
+          "real_peak_force": 39.2,
+          "real_hr": 0
         },
         {
           "time": "03:59 - 04:57",
@@ -26236,7 +26269,8 @@ const SMARTROWER_DATA = [
           "target_spm": 26.0,
           "real_spm": 26.3,
           "target_force": 62.5,
-          "real_peak_force": 63.3
+          "real_peak_force": 63.3,
+          "real_hr": 0
         },
         {
           "time": "04:58 - 11:56",
@@ -26246,7 +26280,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 22.1,
           "target_force": 40.0,
-          "real_peak_force": 43.7
+          "real_peak_force": 43.7,
+          "real_hr": 0
         },
         {
           "time": "11:57 - 12:55",
@@ -26256,7 +26291,8 @@ const SMARTROWER_DATA = [
           "target_spm": 26.0,
           "real_spm": 26.3,
           "target_force": 62.5,
-          "real_peak_force": 62.5
+          "real_peak_force": 62.5,
+          "real_hr": 0
         },
         {
           "time": "12:56 - 19:54",
@@ -26266,7 +26302,8 @@ const SMARTROWER_DATA = [
           "target_spm": 20.0,
           "real_spm": 20.3,
           "target_force": 40.0,
-          "real_peak_force": 42.5
+          "real_peak_force": 42.5,
+          "real_hr": 0
         },
         {
           "time": "19:55 - 20:17",
@@ -26276,7 +26313,8 @@ const SMARTROWER_DATA = [
           "target_spm": 28.0,
           "real_spm": 28.2,
           "target_force": 67.5,
-          "real_peak_force": 65.6
+          "real_peak_force": 65.6,
+          "real_hr": 0
         },
         {
           "time": "20:18 - 27:52",
@@ -26286,7 +26324,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 22.5,
           "target_force": 35.0,
-          "real_peak_force": 38.2
+          "real_peak_force": 38.2,
+          "real_hr": 0
         }
       ],
       "chart": {
@@ -32265,7 +32304,8 @@ const SMARTROWER_DATA = [
           "target_spm": 20.0,
           "real_spm": 20.1,
           "target_force": 40.0,
-          "real_peak_force": 47.7
+          "real_peak_force": 47.7,
+          "real_hr": 0
         },
         {
           "time": "04:00 - 04:29",
@@ -32275,7 +32315,8 @@ const SMARTROWER_DATA = [
           "target_spm": 30.0,
           "real_spm": 30.8,
           "target_force": 60.0,
-          "real_peak_force": 61.7
+          "real_peak_force": 61.7,
+          "real_hr": 0
         },
         {
           "time": "04:30 - 04:59",
@@ -32285,7 +32326,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 22.6,
           "target_force": 40.0,
-          "real_peak_force": 47.2
+          "real_peak_force": 47.2,
+          "real_hr": 0
         },
         {
           "time": "05:00 - 05:29",
@@ -32295,7 +32337,8 @@ const SMARTROWER_DATA = [
           "target_spm": 30.0,
           "real_spm": 30.2,
           "target_force": 60.0,
-          "real_peak_force": 61.6
+          "real_peak_force": 61.6,
+          "real_hr": 0
         },
         {
           "time": "05:30 - 05:59",
@@ -32305,7 +32348,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 22.4,
           "target_force": 40.0,
-          "real_peak_force": 44.8
+          "real_peak_force": 44.8,
+          "real_hr": 0
         },
         {
           "time": "06:00 - 06:29",
@@ -32315,7 +32359,8 @@ const SMARTROWER_DATA = [
           "target_spm": 30.0,
           "real_spm": 30.3,
           "target_force": 60.0,
-          "real_peak_force": 60.5
+          "real_peak_force": 60.5,
+          "real_hr": 0
         },
         {
           "time": "06:30 - 06:59",
@@ -32325,7 +32370,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 22.5,
           "target_force": 40.0,
-          "real_peak_force": 43.6
+          "real_peak_force": 43.6,
+          "real_hr": 0
         },
         {
           "time": "07:00 - 07:29",
@@ -32335,7 +32381,8 @@ const SMARTROWER_DATA = [
           "target_spm": 30.0,
           "real_spm": 30.7,
           "target_force": 60.0,
-          "real_peak_force": 60.2
+          "real_peak_force": 60.2,
+          "real_hr": 0
         },
         {
           "time": "07:30 - 07:59",
@@ -32345,7 +32392,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 22.3,
           "target_force": 40.0,
-          "real_peak_force": 41.8
+          "real_peak_force": 41.8,
+          "real_hr": 0
         },
         {
           "time": "08:00 - 08:29",
@@ -32355,7 +32403,8 @@ const SMARTROWER_DATA = [
           "target_spm": 30.0,
           "real_spm": 30.9,
           "target_force": 60.0,
-          "real_peak_force": 63.6
+          "real_peak_force": 63.6,
+          "real_hr": 0
         },
         {
           "time": "08:30 - 08:59",
@@ -32365,7 +32414,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 24.3,
           "target_force": 40.0,
-          "real_peak_force": 45.3
+          "real_peak_force": 45.3,
+          "real_hr": 0
         },
         {
           "time": "09:00 - 09:29",
@@ -32375,7 +32425,8 @@ const SMARTROWER_DATA = [
           "target_spm": 30.0,
           "real_spm": 30.5,
           "target_force": 60.0,
-          "real_peak_force": 60.0
+          "real_peak_force": 60.0,
+          "real_hr": 0
         },
         {
           "time": "09:30 - 09:59",
@@ -32385,7 +32436,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 22.3,
           "target_force": 40.0,
-          "real_peak_force": 40.1
+          "real_peak_force": 40.1,
+          "real_hr": 0
         },
         {
           "time": "10:00 - 13:59",
@@ -32395,7 +32447,8 @@ const SMARTROWER_DATA = [
           "target_spm": 20.0,
           "real_spm": 20.4,
           "target_force": 35.0,
-          "real_peak_force": 42.3
+          "real_peak_force": 42.3,
+          "real_hr": 0
         }
       ],
       "chart": {
@@ -39034,7 +39087,8 @@ const SMARTROWER_DATA = [
           "target_spm": 20.0,
           "real_spm": 21.0,
           "target_force": 35.0,
-          "real_peak_force": 29.6
+          "real_peak_force": 29.6,
+          "real_hr": 105
         },
         {
           "time": "03:58 - 07:57",
@@ -39044,7 +39098,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 23.7,
           "target_force": 40.0,
-          "real_peak_force": 37.8
+          "real_peak_force": 37.8,
+          "real_hr": 110
         },
         {
           "time": "07:58 - 08:44",
@@ -39054,7 +39109,8 @@ const SMARTROWER_DATA = [
           "target_spm": 30.0,
           "real_spm": 27.3,
           "target_force": 62.5,
-          "real_peak_force": 59.8
+          "real_peak_force": 59.8,
+          "real_hr": 96
         },
         {
           "time": "08:45 - 15:55",
@@ -39064,7 +39120,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 23.7,
           "target_force": 40.0,
-          "real_peak_force": 40.5
+          "real_peak_force": 40.5,
+          "real_hr": 0
         },
         {
           "time": "15:56 - 16:42",
@@ -39074,7 +39131,8 @@ const SMARTROWER_DATA = [
           "target_spm": 30.0,
           "real_spm": 30.5,
           "target_force": 62.5,
-          "real_peak_force": 53.5
+          "real_peak_force": 53.5,
+          "real_hr": 0
         },
         {
           "time": "16:43 - 23:53",
@@ -39084,7 +39142,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 23.7,
           "target_force": 40.0,
-          "real_peak_force": 40.0
+          "real_peak_force": 40.0,
+          "real_hr": 0
         },
         {
           "time": "23:54 - 24:40",
@@ -39094,7 +39153,8 @@ const SMARTROWER_DATA = [
           "target_spm": 30.0,
           "real_spm": 30.8,
           "target_force": 62.5,
-          "real_peak_force": 46.0
+          "real_peak_force": 46.0,
+          "real_hr": 0
         },
         {
           "time": "24:40 - 31:51",
@@ -39104,7 +39164,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 22.6,
           "target_force": 40.0,
-          "real_peak_force": 38.6
+          "real_peak_force": 38.6,
+          "real_hr": 0
         },
         {
           "time": "31:51 - 32:38",
@@ -39114,7 +39175,8 @@ const SMARTROWER_DATA = [
           "target_spm": 32.0,
           "real_spm": 30.5,
           "target_force": 75.0,
-          "real_peak_force": 50.6
+          "real_peak_force": 50.6,
+          "real_hr": 0
         },
         {
           "time": "32:38 - 38:18",
@@ -39124,7 +39186,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 22.2,
           "target_force": 35.0,
-          "real_peak_force": 34.8
+          "real_peak_force": 34.8,
+          "real_hr": 0
         }
       ],
       "chart": {
@@ -45346,7 +45409,8 @@ const SMARTROWER_DATA = [
           "target_spm": 20.0,
           "real_spm": 20.6,
           "target_force": 40.0,
-          "real_peak_force": 28.1
+          "real_peak_force": 28.1,
+          "real_hr": 130
         },
         {
           "time": "09:59 - 12:19",
@@ -45356,7 +45420,8 @@ const SMARTROWER_DATA = [
           "target_spm": 30.0,
           "real_spm": 28.2,
           "target_force": 45.0,
-          "real_peak_force": 35.1
+          "real_peak_force": 35.1,
+          "real_hr": 162
         }
       ],
       "chart": {
@@ -50531,7 +50596,8 @@ const SMARTROWER_DATA = [
           "target_spm": 20.0,
           "real_spm": 20.6,
           "target_force": 35.0,
-          "real_peak_force": 34.1
+          "real_peak_force": 34.1,
+          "real_hr": 109
         },
         {
           "time": "03:59 - 04:57",
@@ -50541,7 +50607,8 @@ const SMARTROWER_DATA = [
           "target_spm": 26.0,
           "real_spm": 23.6,
           "target_force": 62.5,
-          "real_peak_force": 56.0
+          "real_peak_force": 56.0,
+          "real_hr": 136
         },
         {
           "time": "04:58 - 11:56",
@@ -50551,7 +50618,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 23.4,
           "target_force": 40.0,
-          "real_peak_force": 40.3
+          "real_peak_force": 40.3,
+          "real_hr": 141
         },
         {
           "time": "11:57 - 12:55",
@@ -50561,7 +50629,8 @@ const SMARTROWER_DATA = [
           "target_spm": 26.0,
           "real_spm": 17.1,
           "target_force": 62.5,
-          "real_peak_force": 55.9
+          "real_peak_force": 55.9,
+          "real_hr": 151
         },
         {
           "time": "12:56 - 13:23",
@@ -50571,7 +50640,8 @@ const SMARTROWER_DATA = [
           "target_spm": 20.0,
           "real_spm": 0,
           "target_force": 40.0,
-          "real_peak_force": 0
+          "real_peak_force": 0,
+          "real_hr": 149
         }
       ],
       "chart": {
@@ -56676,7 +56746,8 @@ const SMARTROWER_DATA = [
           "target_spm": 20.0,
           "real_spm": 20.4,
           "target_force": 35.0,
-          "real_peak_force": 35.2
+          "real_peak_force": 35.2,
+          "real_hr": 97
         },
         {
           "time": "03:59 - 04:57",
@@ -56686,7 +56757,8 @@ const SMARTROWER_DATA = [
           "target_spm": 26.0,
           "real_spm": 26.5,
           "target_force": 62.5,
-          "real_peak_force": 45.7
+          "real_peak_force": 45.7,
+          "real_hr": 118
         },
         {
           "time": "04:58 - 11:56",
@@ -56696,7 +56768,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 22.8,
           "target_force": 40.0,
-          "real_peak_force": 30.9
+          "real_peak_force": 30.9,
+          "real_hr": 115
         },
         {
           "time": "11:57 - 12:55",
@@ -56706,7 +56779,8 @@ const SMARTROWER_DATA = [
           "target_spm": 26.0,
           "real_spm": 27.9,
           "target_force": 62.5,
-          "real_peak_force": 34.4
+          "real_peak_force": 34.4,
+          "real_hr": 128
         },
         {
           "time": "12:56 - 19:54",
@@ -56716,7 +56790,8 @@ const SMARTROWER_DATA = [
           "target_spm": 20.0,
           "real_spm": 20.3,
           "target_force": 40.0,
-          "real_peak_force": 39.6
+          "real_peak_force": 39.6,
+          "real_hr": 118
         },
         {
           "time": "19:55 - 20:17",
@@ -56726,7 +56801,8 @@ const SMARTROWER_DATA = [
           "target_spm": 28.0,
           "real_spm": 29.0,
           "target_force": 67.5,
-          "real_peak_force": 44.0
+          "real_peak_force": 44.0,
+          "real_hr": 126
         },
         {
           "time": "20:18 - 27:23",
@@ -56736,7 +56812,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 22.6,
           "target_force": 35.0,
-          "real_peak_force": 30.3
+          "real_peak_force": 30.3,
+          "real_hr": 118
         }
       ],
       "chart": {
@@ -62598,7 +62675,8 @@ const SMARTROWER_DATA = [
           "target_spm": 20.0,
           "real_spm": 20.1,
           "target_force": 40.0,
-          "real_peak_force": 40.7
+          "real_peak_force": 40.7,
+          "real_hr": 98
         },
         {
           "time": "05:00 - 09:59",
@@ -62608,7 +62686,8 @@ const SMARTROWER_DATA = [
           "target_spm": 26.0,
           "real_spm": 26.2,
           "target_force": 45.0,
-          "real_peak_force": 46.7
+          "real_peak_force": 46.7,
+          "real_hr": 140
         },
         {
           "time": "10:00 - 14:59",
@@ -62618,7 +62697,8 @@ const SMARTROWER_DATA = [
           "target_spm": 28.0,
           "real_spm": 28.2,
           "target_force": 50.0,
-          "real_peak_force": 52.8
+          "real_peak_force": 52.8,
+          "real_hr": 162
         },
         {
           "time": "15:00 - 16:00",
@@ -62628,7 +62708,8 @@ const SMARTROWER_DATA = [
           "target_spm": 30.0,
           "real_spm": 29.9,
           "target_force": 55.0,
-          "real_peak_force": 53.9
+          "real_peak_force": 53.9,
+          "real_hr": 169
         },
         {
           "time": "16:00 - 20:59",
@@ -62638,7 +62719,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 22.3,
           "target_force": 40.0,
-          "real_peak_force": 40.4
+          "real_peak_force": 40.4,
+          "real_hr": 150
         },
         {
           "time": "21:00 - 25:59",
@@ -62648,7 +62730,8 @@ const SMARTROWER_DATA = [
           "target_spm": 26.0,
           "real_spm": 26.2,
           "target_force": 45.0,
-          "real_peak_force": 44.5
+          "real_peak_force": 44.5,
+          "real_hr": 159
         },
         {
           "time": "26:00 - 30:59",
@@ -62658,7 +62741,8 @@ const SMARTROWER_DATA = [
           "target_spm": 28.0,
           "real_spm": 28.1,
           "target_force": 50.0,
-          "real_peak_force": 50.2
+          "real_peak_force": 50.2,
+          "real_hr": 170
         },
         {
           "time": "31:00 - 31:59",
@@ -62668,7 +62752,8 @@ const SMARTROWER_DATA = [
           "target_spm": 30.0,
           "real_spm": 30.0,
           "target_force": 55.0,
-          "real_peak_force": 51.8
+          "real_peak_force": 51.8,
+          "real_hr": 174
         },
         {
           "time": "32:00 - 35:52",
@@ -62678,7 +62763,8 @@ const SMARTROWER_DATA = [
           "target_spm": 20.0,
           "real_spm": 20.4,
           "target_force": 40.0,
-          "real_peak_force": 38.3
+          "real_peak_force": 38.3,
+          "real_hr": 154
         }
       ],
       "chart": {
@@ -69512,7 +69598,8 @@ const SMARTROWER_DATA = [
           "target_spm": 20.0,
           "real_spm": 20.2,
           "target_force": 35.0,
-          "real_peak_force": 35.8
+          "real_peak_force": 35.8,
+          "real_hr": 0
         },
         {
           "time": "03:59 - 07:57",
@@ -69522,7 +69609,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 22.0,
           "target_force": 40.0,
-          "real_peak_force": 41.3
+          "real_peak_force": 41.3,
+          "real_hr": 0
         },
         {
           "time": "07:58 - 09:56",
@@ -69532,7 +69620,8 @@ const SMARTROWER_DATA = [
           "target_spm": 24.0,
           "real_spm": 24.6,
           "target_force": 57.5,
-          "real_peak_force": 60.6
+          "real_peak_force": 60.6,
+          "real_hr": 0
         },
         {
           "time": "09:57 - 13:56",
@@ -69542,7 +69631,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 22.3,
           "target_force": 35.0,
-          "real_peak_force": 38.3
+          "real_peak_force": 38.3,
+          "real_hr": 0
         },
         {
           "time": "13:56 - 15:54",
@@ -69552,7 +69642,8 @@ const SMARTROWER_DATA = [
           "target_spm": 24.0,
           "real_spm": 24.0,
           "target_force": 57.5,
-          "real_peak_force": 56.7
+          "real_peak_force": 56.7,
+          "real_hr": 0
         },
         {
           "time": "15:55 - 27:53",
@@ -69562,7 +69653,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 22.2,
           "target_force": 40.0,
-          "real_peak_force": 41.6
+          "real_peak_force": 41.6,
+          "real_hr": 0
         },
         {
           "time": "27:54 - 31:53",
@@ -69572,7 +69664,8 @@ const SMARTROWER_DATA = [
           "target_spm": 22.0,
           "real_spm": 22.7,
           "target_force": 35.0,
-          "real_peak_force": 39.9
+          "real_peak_force": 39.9,
+          "real_hr": 0
         }
       ],
       "chart": {
