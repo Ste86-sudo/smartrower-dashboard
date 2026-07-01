@@ -63,6 +63,43 @@ const COACH_ANALYSES = {
             totalDur: 1200
         }
     },
+    "Regeneration training 4 (26 June)": {
+        theme: "🔋 Ricarica Passiva: Allenamento alla Cieca",
+        intro: "Un allenamento di puro scarico neuromuscolare e metabolico. Questa volta lo hai affrontato senza cardiofrequenzimetro, affidandoti esclusivamente alle tue sensazioni e al controllo della cadenza.",
+        highlights: [
+            {
+                icon: "🧘‍♂️",
+                title: "1. Propriocezione Pura",
+                text: "Senza il feedback del battito cardiaco (0 bpm registrati), sei stato costretto a 'sentire' lo sforzo. Hai mantenuto una media perfetta di <strong>20.5 SPM</strong> per tutta la sessione, dimostrando che il tuo metronomo interno è perfettamente calibrato."
+            },
+            {
+                icon: "📉",
+                title: "2. Potenza Controllata",
+                text: "Il target era estremamente basso (160W). Sei rimasto volutamente conservativo chiudendo a <strong>148W</strong> di media. In una sessione di rigenerazione, stare <em>sotto</em> il target è spesso molto più intelligente che stare sopra. Hai permesso al sistema nervoso di recuperare senza accumulare nuovo stress."
+            }
+        ],
+        analysis: {
+            title: "🧘 Analisi: Regeneration 4 (Recupero Attivo)",
+            text: `Questo è esattamente quello che serve dopo le sessioni massimali o prima di un test importante. L'assenza della fascia cardio ti ha paradossalmente aiutato a non "fissarti" sui numeri e a remare in modo fluido e decontratto.<br><br>
+                   La forza di picco media è crollata a <strong>37.7 kgf</strong> (contro i quasi 60 kgf delle tue sessioni anaerobiche). Questo significa che hai disattivato le fibre bianche veloci e hai fatto girare solo il sistema aerobico di base, lavando via i cataboliti muscolari.<br><br>
+                   <strong>Il Prossimo Step:</strong> Ora che il serbatoio è ricaricato, il corpo è pronto per una nuova sfida. È tempo di tornare a testare la soglia anaerobica.`
+        },
+        nextWorkout: {
+            title: "Threshold Builder",
+            type: "TEMPO",
+            desc: "4 blocchi da 5 minuti in Sweet Spot (88-92% FTP). Focus sulla tenuta mentale e sullo smaltimento del lattato in regime di soglia.",
+            steps: [
+                {"dur": 600, "pwr": 0.6},
+                {"dur": 300, "pwr": 0.9}, {"dur": 120, "pwr": 0.5},
+                {"dur": 300, "pwr": 0.9}, {"dur": 120, "pwr": 0.5},
+                {"dur": 300, "pwr": 0.9}, {"dur": 120, "pwr": 0.5},
+                {"dur": 300, "pwr": 0.9},
+                {"dur": 600, "pwr": 0.5}
+            ],
+            maxPwr: 0.9,
+            totalDur: 3260
+        }
+    },
     "Aerobic Capacity 6": {
         theme: "👑 L'Apoteosi del Lattato: Sforzo Massimale",
         intro: "Questa sessione è stata un'escalation chirurgica. Hai affrontato tre blocchi a piramide arrivando ogni volta a sfiorare i tuoi limiti, con una precisione millimetrica sui wattaggi richiesti.",
@@ -155,7 +192,11 @@ function getPhaseColor(pwr) {
 }
 
 function buildAdviceHTML(workout) {
-    const analysisData = COACH_ANALYSES[workout.title];
+    let analysisKey = workout.title;
+    if (workout.title === "Regeneration training 4" && workout.date && workout.date.includes("2026-06-26")) {
+        analysisKey = "Regeneration training 4 (26 June)";
+    }
+    const analysisData = COACH_ANALYSES[analysisKey];
     if (!analysisData) {
         return ""; // Se non c'è analisi specifica, non mostriamo nulla (oppure potremmo mostrare un fallback)
     }
