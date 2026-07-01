@@ -1,5 +1,68 @@
 const COACH_ANALYSES = {
-    "Aerobic Capacity 6": {
+    "Long VO2max Intervals 2": {
+        theme: "🫀 Sofferenza Pura: Il Muro del Lattato",
+        intro: "Questa è la definizione da manuale di un allenamento per il VO2Max. Hai alternato blocchi ad altissima intensità a recuperi in zona aerobica, portando il sistema cardiovascolare all'esasperazione.",
+        highlights: [
+            {
+                icon: "🚀",
+                title: "1. Le Sfuriate a 275 Watt",
+                text: "Hai aperto le danze con due blocchi da 1 minuto a quasi <strong>275W</strong>. È una potenza paurosa. In questa fase il tuo sistema ha bruciato fosfati e glicogeno come se non ci fosse un domani, attivando in pieno le fibre veloci."
+            },
+            {
+                icon: "📈",
+                title: "2. La Deriva Cardiaca in Diretta",
+                text: "Nei blocchi successivi (1 minuto a 300W target), la potenza è fisiologicamente e leggermente calata (<strong>272W -> 255W -> 251W</strong>), ma guarda i battiti: <strong>141 -> 157 -> 161 -> 167 bpm</strong>! A parità di sforzo (anzi, perfino con watt inferiori), il tuo cuore ha dovuto battere sempre più forte per sopperire alla mancanza di ossigeno e allo smaltimento dell'acido lattico. È la prova che il VO2Max è stato stimolato al 100%."
+            }
+        ],
+        analysis: {
+            title: "🧬 Analisi: Long VO2max Intervals 2 (Il debito d'ossigeno)",
+            text: \`Un allenamento del genere crea un debito d'ossigeno enorme. I 12 secondi a 400W target (chiusi a ~265W) sono serviti come "innesco" neuromuscolare per preparare il sistema nervoso centrale, ma il vero lavoro lo hai fatto nei blocchi da 1 minuto.<br><br>
+                   Non farti frustrare dal fatto che nei blocchi da 300W non hai tenuto i 300W, ma sei sceso a 251W. Per la tua fisiologia attuale, 270W è già uno stimolo supramassimale. Il fatto che tu abbia tenuto i 180-190W di media nei blocchi di "recupero" da 3 minuti è ammirevole e dimostra un'eccellente capacità di clearing del lattato.<br><br>
+                   <strong>Il Prossimo Step:</strong> Questo allenamento richiede almeno 48h di recupero muscolare. Il prossimo deve essere un fondo lungo a bassissima intensità per favorire la capillarizzazione.\`
+        },
+        nextWorkout: {
+            title: "Base Aerobica",
+            type: "AEROBIC ENDURANCE",
+            desc: "45 minuti di fondo lento in Zona 2 (max 130 bpm). Nessun picco, nessuna accelerazione. Solo volume.",
+            steps: [
+                {"dur": 2700, "pwr": 0.6}
+            ],
+            maxPwr: 0.6,
+            totalDur: 2700
+        }
+    },
+    "Aerobic Capacity 4": {
+        theme: "🧱 Il Cedimento Muscolare: Quando Finisce la Benzina",
+        intro: "Hai affrontato un'impegnativa piramide di potenza. L'hai scalata con grande autorità, ma la discesa ha presentato un conto salato. Questo è un allenamento che racconta una storia fisiologica chiarissima.",
+        highlights: [
+            {
+                icon: "🏔️",
+                title: "1. La Vetta a 252 Watt",
+                text: "Hai scalato i blocchi da 140W, 160W, 200W, 230W centrando perfettamente i target, fino a raggiungere il picco della piramide a <strong>252.3W</strong> (159 bpm). Un'esecuzione impeccabile e un dominio totale della macchina."
+            },
+            {
+                icon: "⛽",
+                title: "2. Il Serbatoio Vuoto",
+                text: "Dopo il picco, sei sceso a 200W senza problemi (200.7W), ma al successivo gradino da 230W c'è stato il <strong>cedimento totale</strong> (76.1W -> 0W). La Frequenza Cardiaca era a 153 bpm, non al massimale: questo significa che non ha ceduto il cuore, ha ceduto il muscolo. Hai esaurito completamente il glicogeno muscolare e le fibre veloci si sono letteralmente spente."
+            }
+        ],
+        analysis: {
+            title: "🧬 Analisi: Aerobic Capacity 4 (L'esaurimento del Glicogeno)",
+            text: \`Non c'è niente di cui vergognarsi nell'aver fallito l'ultimo intervallo. Negli sport di potenza prolungata, colpire il "muro" muscolare è parte integrante dell'adattamento. <br><br>
+                   Il fatto che il tuo cuore fosse a soli 153 bpm nel momento dell'abbandono (rispetto ai 160 bpm toccati poco prima) è la prova del nove: <em>cedimento periferico</em>, non centrale. Le gambe erano vuote. Probabilmente un calo di zuccheri o un mancato recupero dalla sessione precedente.<br><br>
+                   <strong>Il Prossimo Step:</strong> Impara ad ascoltare questi segnali. Quando le fibre esplosive sono "fritte", insistere porta solo a infortuni. Fai il carico di carboidrati e dedicati al defaticamento.\`
+        },
+        nextWorkout: {
+            title: "Recovery Row",
+            type: "ACTIVE RECOVERY",
+            desc: "20 minuti di scioglimento leggero. 20 SPM, niente forza, solo circolazione.",
+            steps: [
+                {"dur": 1200, "pwr": 0.5}
+            ],
+            maxPwr: 0.5,
+            totalDur: 1200
+        }
+    },
         theme: "👑 L'Apoteosi del Lattato: Sforzo Massimale",
         intro: "Questa sessione è stata un'escalation chirurgica. Hai affrontato tre blocchi a piramide arrivando ogni volta a sfiorare i tuoi limiti, con una precisione millimetrica sui wattaggi richiesti.",
         highlights: [
