@@ -63,6 +63,7 @@ const COACH_ANALYSES = {
             totalDur: 1200
         }
     },
+    "Aerobic Capacity 6": {
         theme: "👑 L'Apoteosi del Lattato: Sforzo Massimale",
         intro: "Questa sessione è stata un'escalation chirurgica. Hai affrontato tre blocchi a piramide arrivando ogni volta a sfiorare i tuoi limiti, con una precisione millimetrica sui wattaggi richiesti.",
         highlights: [
