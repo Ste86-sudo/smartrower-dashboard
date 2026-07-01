@@ -8,6 +8,7 @@ import json
 import warnings
 warnings.filterwarnings('ignore')
 import re
+from datetime import datetime
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CSV_DIR = os.path.join(BASE_DIR, "smartrower_downloads")
@@ -117,10 +118,14 @@ def compute_pulley_alpha(cord_pos, force_kg):
     return alpha, p95, cmax, bool(coerente)
 
 def parse_filename_date(filename):
-    # SmartRower_Export_2026-06-04T17-12-48-131Z.csv
-    match = re.search(r'(\d{4}-\d{2}-\d{2})T(\d{2})-(\d{2})-(\d{2})', filename)
+    match = re.search(r'(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2})', filename)
     if match:
-        return f"{match.group(1)} {match.group(2)}:{match.group(3)}:{match.group(4)}"
+        dt = datetime.strptime(match.group(1), "%Y-%m-%dT%H-%M-%S")
+        return dt.strftime("%Y-%m-%d %H:%M:%S")
+    match_short = re.search(r'(\d{4}-\d{2}-\d{2})', filename)
+    if match_short:
+        dt = datetime.strptime(match_short.group(1), "%Y-%m-%d")
+        return dt.strftime("%Y-%m-%d %H:%M:%S")
     return "Unknown Date"
 
 def process_smartrower_csv(filepath):

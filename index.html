@@ -918,7 +918,11 @@
         function renderCharts(data) {
             // We want to sort chronologically for progression graph (oldest to newest)
             const chronologicalData = [...data].reverse();
-            const labels = chronologicalData.map(w => w.date.split(" ")[0]);
+            const labels = chronologicalData.map(w => {
+                if (!w.date || w.date.includes("Unknown")) return "N/A";
+                const d = new Date(w.date.replace(/-/g, '/')); // Fix Safari parsing issues if any
+                return isNaN(d) ? "N/A" : d.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' });
+            });
             
             const avgPowers = chronologicalData.map(w => w.avg_power);
             const maxPowers = chronologicalData.map(w => w.max_power);
