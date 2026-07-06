@@ -9,6 +9,7 @@ import warnings
 warnings.filterwarnings('ignore')
 import re
 from datetime import datetime
+import biomechanics as bio
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CSV_DIR = os.path.join(BASE_DIR, "smartrower_downloads")
@@ -524,6 +525,20 @@ def process_smartrower_csv(filepath):
         if len(p_list) >= 10:
             power_pos_W = round(float(np.median(p_list)), 1)
 
+    # ── ANALISI BIOMECCANICA (motore biomechanics.py) ──────────────────────────
+    # Estrae, quality-aware, le metriche del riferimento tecnico: curva forza-tempo e
+    # forza-posizione ensemble (normalizzate per fase), fullness, posizione-picco, RFD,
+    # impulso, drive length, drive:recovery, e (sperimentale) Catch Factor / RSF quando
+    # sedile e corda sono entrambi vivi. Fonte di verita' UNICA: il frontend legge
+    # questi numeri, non li ricalcola (evita la doppia soglia incoerente di prima).
+    try:
+        biomech = bio.analyze(df, seg_threshold, data_quality)
+    except Exception as e:
+        print(f"  [!] Analisi biomeccanica fallita: {e}")
+        biomech = {"availability": {"force": False, "position": False,
+                                    "coordination": False, "coordination_calibrated": False},
+                   "session": {}, "by_spm": {}, "reference": {}}
+
     physics = {
         "model": "F = b2*v^2 + F0 (aria pura, V-Fit Tornado)",
         "b2_provv": B2_PROVV,
@@ -567,7 +582,7 @@ def process_smartrower_csv(filepath):
                 "stroke_spm": spm,
                 "stroke_peak_force": peak_forces
             },
-            "force_curves": force_curves_export,
+            "biomechanics": biomech,
             "data_quality": data_quality,
             "physics": physics
         }

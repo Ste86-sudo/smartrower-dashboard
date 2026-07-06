@@ -1119,206 +1119,186 @@
             renderModalChartStroke('srModalChartSPM', w.smartrower.chart.time_s, w.smartrower.chart.target_spm, w.smartrower.chart.stroke_t, w.smartrower.chart.stroke_spm, 'Cadence (SPM)', '#4da6ff', 'Target SPM', 'Real SPM');
             renderModalChartStroke('srModalChartForce', w.smartrower.chart.time_s, w.smartrower.chart.target_force, w.smartrower.chart.stroke_t, w.smartrower.chart.stroke_peak_force, 'Force', '#ffcc00', 'Target Force', 'Peak Force');
 
-            // Force Curves & Coaching (Dynamic SPM)
+            // Biomeccanica (fonte unica: dati calcolati in Python, non ricalcolati qui)
+            renderBiomechanicsSection(w);
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // SEZIONE BIOMECCANICA — legge w.smartrower.biomechanics (Python).
+        // Nessuna metrica viene ricalcolata nel browser: si evita la vecchia
+        // incoerenza (soglia F_peak*0.1 in JS vs soglia-tara in Python).
+        // ─────────────────────────────────────────────────────────────────────
+        const GRADE_COLOR = { ottimo: '#10b981', buono: '#f59e0b', da_migliorare: '#ef4444', sperimentale: '#8b5cf6' };
+        const GRADE_LABEL = { ottimo: 'Ottimo', buono: 'Buono', da_migliorare: 'Da migliorare', sperimentale: 'Sperimentale' };
+
+        function renderBiomechanicsSection(w) {
             const forceSection = document.querySelector('.sr-force-curve-section');
+            const bio = w.smartrower.biomechanics;
             const tabsContainer = document.getElementById('srForceSpmTabs');
             tabsContainer.innerHTML = '';
 
-            if (w.smartrower.force_curves && Object.keys(w.smartrower.force_curves).length > 0) {
-                const spms = Object.keys(w.smartrower.force_curves).sort((a,b) => parseInt(a) - parseInt(b));
-                
-                spms.forEach((spm, index) => {
-                    const btn = document.createElement('button');
-                    btn.innerText = spm + " SPM";
-                    btn.style.padding = "6px 12px";
-                    btn.style.borderRadius = "6px";
-                    btn.style.border = "1px solid rgba(255,255,255,0.2)";
-                    btn.style.background = "transparent";
-                    btn.style.color = "#fff";
-                    btn.style.cursor = "pointer";
-                    btn.style.fontFamily = "var(--font-base)";
-                    btn.style.fontSize = "0.9rem";
-                    
-                    btn.onclick = () => {
-                        Array.from(tabsContainer.children).forEach(c => {
-                            c.style.background = 'transparent';
-                            c.style.borderColor = 'rgba(255,255,255,0.2)';
-                        });
-                        btn.style.background = 'rgba(99, 102, 241, 0.2)';
-                        btn.style.borderColor = '#6366f1';
-                        renderForceCurveBySpm(w.smartrower.force_curves[spm], w, spm);
-                    };
-                    tabsContainer.appendChild(btn);
-                });
-                
-forceSection.style.display = 'block';
-                if(tabsContainer.firstChild) tabsContainer.firstChild.click();
-            } else {
+            // Fallback: se manca il blocco biomeccanica, nascondi la sezione.
+            if (!bio || !bio.by_spm || Object.keys(bio.by_spm).length === 0) {
                 forceSection.style.display = 'none';
+                return;
+            }
+            forceSection.style.display = 'block';
+
+            // Strip disponibilità dei tre segnali (trasparenza sulla qualità del dato)
+            const av = bio.availability || {};
+            const chips = [
+                ['Forza', av.force, 'Cella di carico → curva di forza, fullness, RFD, impulso'],
+                ['Posizione', av.position, 'Encoder corda → drive length, curva forza-posizione'],
+                ['Coordinazione', av.coordination, 'Sellino+corda → Catch Factor, sequenza (sperimentale)']
+            ];
+            document.getElementById('srSignalStrip').innerHTML = chips.map(([name, ok, tip]) => {
+                const col = ok ? '#10b981' : '#6b7280';
+                const ic = ok ? '●' : '○';
+                return `<span title="${tip}" style="display:inline-flex; align-items:center; gap:0.35rem; font-size:0.75rem; color:${col}; border:1px solid ${col}55; border-radius:20px; padding:0.25rem 0.7rem;">${ic} ${name}${ok ? '' : ' n/d'}</span>`;
+            }).join('');
+
+            const spms = Object.keys(bio.by_spm).sort((a,b) => parseInt(a) - parseInt(b));
+            spms.forEach((spm) => {
+                const btn = document.createElement('button');
+                btn.innerText = spm + " SPM";
+                btn.style.cssText = "padding:6px 12px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:transparent; color:#fff; cursor:pointer; font-size:0.9rem;";
+                btn.onclick = () => {
+                    Array.from(tabsContainer.children).forEach(c => { c.style.background='transparent'; c.style.borderColor='rgba(255,255,255,0.2)'; });
+                    btn.style.background = 'rgba(99, 102, 241, 0.2)';
+                    btn.style.borderColor = '#6366f1';
+                    renderBioBySpm(bio, w, spm);
+                };
+                tabsContainer.appendChild(btn);
+            });
+            if (tabsContainer.firstChild) tabsContainer.firstChild.click();
+        }
+
+        // Card metrica con banda di riferimento e giudizio colorato
+        function metricCard(label, value, unit, band, grade, tip) {
+            const col = GRADE_COLOR[grade] || '#9ca3af';
+            const gl = grade ? `<span style="font-size:0.68rem; color:${col};">${GRADE_LABEL[grade]||grade}</span>` : '';
+            const bandTxt = band ? `<span style="font-size:0.7rem; color:var(--text-muted);">rif. ${band}</span>` : '';
+            const val = (value === null || value === undefined) ? '—' : value;
+            return `<div title="${tip||''}" style="background:rgba(255,255,255,0.02); border:1px solid ${col}33; border-left:3px solid ${col}; border-radius:10px; padding:0.7rem 0.85rem;">
+                <div style="font-size:0.7rem; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.03em;">${label}</div>
+                <div style="font-family:var(--font-display); font-size:1.5rem; font-weight:700; color:#fff; line-height:1.15;">${val}<span style="font-size:0.8rem; color:var(--text-secondary); margin-left:0.15rem;">${unit||''}</span></div>
+                <div style="display:flex; justify-content:space-between; gap:0.5rem; margin-top:0.15rem;">${bandTxt}${gl}</div>
+            </div>`;
+        }
+
+        function renderBioBySpm(bio, w, spmStr) {
+            const m = bio.by_spm[spmStr];
+            if (!m) return;
+            const ref = bio.reference || {};
+            const A = m.assessment || {};
+            const g = (k) => (A[k] && A[k].grade) || null;
+
+            // Griglia metriche (valori Python, bande dal documento)
+            const cards = [];
+            cards.push(metricCard('Fullness (Φ)', m.fullness!=null? m.fullness.toFixed(2):null, '',
+                ref.fullness? ref.fullness[0].toFixed(2)+'–'+ref.fullness[1].toFixed(2):'0.50–0.65', g('fullness'),
+                'Rapporto forza media/picco. Banda elite 0.50–0.65.'));
+            cards.push(metricCard('Pos. Picco', m.peak_pos!=null? Math.round(m.peak_pos*100):null, '%',
+                '32–40%', g('peak_pos'),
+                'Momento del picco di forza in % del drive (in tempo). Ideale 32–40%.'));
+            cards.push(metricCard('RFD', m.rfd_ns!=null? Math.round(m.rfd_ns):null, 'N/s', null, null,
+                'Rate of Force Development: pendenza iniziale della curva. Più alto = più esplosivo.'));
+            cards.push(metricCard('Forza Picco', m.f_peak_n!=null? Math.round(m.f_peak_n):null, 'N', null, null,
+                'Forza massima al manubrio (' + (m.f_peak_kg||'?') + ' kgf).'));
+            cards.push(metricCard('Impulso', m.impulse_ns!=null? Math.round(m.impulse_ns):null, 'N·s', null, null,
+                'Integrale forza-tempo sul drive (lavoro per vogata).'));
+            if (m.drive_length_m != null)
+                cards.push(metricCard('Drive Length', m.drive_length_m.toFixed(2), 'm', '1.2–1.4', null,
+                    'Corsa utile del manubrio misurata dalla corda.'));
+            if (m.dr_ratio != null)
+                cards.push(metricCard('Drive:Recupero', m.dr_ratio.toFixed(2), '', '0.33–0.55', g('dr_ratio'),
+                    'Rapporto durata drive/recupero. Avanzati ~1:2.'));
+            if (m.catch_factor_ms != null)
+                cards.push(metricCard('Catch Factor', Math.round(m.catch_factor_ms), 'ms', 'sperim.', g('catch_factor'),
+                    'Timing sellino↔manubrio al catch. Non ancora calibrato fra sensori.'));
+            if (m.rsf != null)
+                cards.push(metricCard('Style Factor', Math.round(m.rsf*100), '%', 'sperim.', g('rsf'),
+                    'Corsa sellino/manubrio nel primo 20% del drive.'));
+            document.getElementById('srBioMetrics').innerHTML = cards.join('');
+
+            // Cue di coaching prioritario (dal motore Python) + pace e confronto storico
+            const cue = A.priority_cue ? `<div style="background:rgba(99,102,241,0.06); border:1px dashed rgba(99,102,241,0.3); border-radius:10px; padding:0.85rem 1rem;"><strong style="color:var(--color-accent);">🎯 Cue prioritario</strong><br>${A.priority_cue}</div>` : '';
+            document.getElementById('srForceCoaching').innerHTML = cue + buildHistoricalMsg(w, spmStr);
+
+            // Curve: forza-tempo (fase) e forza-posizione (% corsa)
+            renderPhaseCurve('srModalChartForceCurve', m.ft_curve, 'Tempo (fase %)', ref);
+            const fpWrap = document.getElementById('srFpWrap');
+            if (m.fp_curve && m.fp_curve.length) {
+                fpWrap.style.display = 'block';
+                renderPhaseCurve('srModalChartForcePos', m.fp_curve, 'Corsa (%)', ref);
+            } else {
+                fpWrap.style.display = 'none';
             }
         }
-        
-        function renderForceCurveBySpm(dataSpm, currentSession, currentSpmStr) {
-            if(!dataSpm || !dataSpm.mid || dataSpm.mid.length === 0) return;
-            renderForceCurveChart('srModalChartForceCurve', dataSpm);
-            
-            const curve = dataSpm.mid;
-            const F_peak = Math.max(...curve);
-            
-            // Trova la fase di drive ignorando la tensione di ritorno dell'elastico (bungee cord, ~2-3kg)
-            const threshold = Math.max(4.0, F_peak * 0.1);
-            let drive_indices = [];
-            for (let i = 0; i < curve.length; i++) {
-                if (curve[i] > threshold) drive_indices.push(i);
-            }
-            if (drive_indices.length === 0) return;
-            
-            const drive_start_idx = drive_indices[0];
-            const t_drive = drive_indices.length * 0.05; // secondi
-            const peak_idx = curve.indexOf(F_peak);
-            
-            // t_peak deve essere calcolato dall'inizio del drive (drive_start_idx), non dall'inizio dell'array
-            const t_peak = Math.max(0, (peak_idx - drive_start_idx)) * 0.05;
-            
-            // F_mean sul drive
-            const drive_forces = drive_indices.map(i => curve[i]);
-            const F_mean = drive_forces.reduce((a, b) => a + b, 0) / drive_forces.length;
-            
-            // Fullness
-            const fullness = F_mean / F_peak;
-            
-            // RFD e Posizione Picco
-            const rfd = t_peak > 0 ? F_peak / t_peak : F_peak;
-            const peak_pos_pct = t_drive > 0 ? (t_peak / t_drive) : 0;
-            
-            // Picchi secondari (ondulazioni)
-            let secondary_peaks = 0;
-            for (let i = peak_idx + 2; i < drive_indices[drive_indices.length - 1]; i++) {
-                if (curve[i] > curve[i-1] && curve[i] > curve[i+1] && curve[i] > 2.0) {
-                    // Controlla la prominence (almeno 1kg di differenza dal minimo precedente locale)
-                    let local_min = curve[i];
-                    for(let j = i-1; j > peak_idx; j--) {
-                        if (curve[j] < local_min) local_min = curve[j];
-                    }
-                    if (curve[i] - local_min > 1.0) secondary_peaks++;
-                }
-            }
-            
-            let priorityCue = "";
-            
-            // Logica del Cue (Scegliamo il primo problema più grave)
-            // 1. Catch Factor (Timing Iniziale) ha priorità assoluta se disponibile
-            const cf = dataSpm.catch_factor_ms;
-            if (cf !== undefined && cf !== null) {
-                if (cf > 0) {
-                    priorityCue = "⚠️ <strong>Inverti la direzione attaccando!</strong><br>Non aspettare di essere fermo. Il manubrio è in ritardo rispetto al sedile (" + Math.round(cf) + " ms). Perdi il pre-carico elastico.";
-                } else if (cf < -50) {
-                    priorityCue = "⚠️ <strong>Frena la slitta!</strong><br>Il sedile scappa via prima di caricare (Catch Factor: " + Math.round(cf) + " ms). Le gambe partono a vuoto senza spostare il manubrio.";
-                }
-            }
-            
-            if (priorityCue === "") {
-                if (peak_pos_pct > 0.42) {
-                    priorityCue = "⚠️ <strong>Anticipa lo sforzo: il massimo va nella prima metà!</strong><br>Stai raggiungendo il picco troppo tardi (" + Math.round(peak_pos_pct*100) + "% della passata). Carica il peso all'inizio.";
-            } else if (rfd < 60.0) { // RFD sotto 60 kg/s è considerato lento per questo ergometro
-                priorityCue = "⚠️ <strong>Aggancia la pedana subito all'attacco!</strong><br>La velocità di sviluppo della forza (RFD) è bassa (" + Math.round(rfd) + " kg/s). Devi essere più esplosivo con le gambe all'inizio.";
-            } else if (fullness < 0.52) {
-                priorityCue = "⚠️ <strong>Mantieni la connessione per tutta la passata!</strong><br>La curva è troppo 'a spillo' (Fullness: " + fullness.toFixed(2) + ", target > 0.55). Non mollarla dopo il colpo iniziale.";
-            } else if (secondary_peaks >= 1) {
-                priorityCue = "⚠️ <strong>Fondi la spinta delle gambe con l'apertura del busto!</strong><br>La curva mostra scossoni (picchi secondari). Il passaggio gambe -> schiena -> braccia non è fluido.";
-            } else {
-                priorityCue = "🎯 <strong>Curva di forza eccellente!</strong><br>Ottima connessione, picco nella prima metà e rilascio fluido. Stai vogando in modo eccezionalmente efficiente.";
-            }
-            } // Close the if (priorityCue === "") block
-            
-            const statsHtml = `
-                <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; font-size: 0.85rem; color: #9ca3af;">
-                    <span class="badge-smartrower" style="color: #3b82f6; border-color: #3b82f6;">Picco: ${F_peak.toFixed(1)} kgf</span>
-                    <span class="badge-smartrower" style="color: #10b981; border-color: #10b981;">Fullness (Φ): ${fullness.toFixed(2)}</span>
-                    <span class="badge-smartrower" style="color: #f59e0b; border-color: #f59e0b;">Pos. Picco: ${Math.round(peak_pos_pct*100)}%</span>
-                    <span class="badge-smartrower" style="color: #ec4899; border-color: #ec4899;">RFD: ${rfd.toFixed(1)} kg/s</span>
-                    ${cf !== undefined && cf !== null ? `<span class="badge-smartrower" style="color: #8b5cf6; border-color: #8b5cf6;">Catch Factor: ${Math.round(cf)} ms</span>` : ''}
-                </div>
-            `;
 
-            let coachMsg = priorityCue + statsHtml;
-            
-            // Pace & Historical Comparison
+        // Passo stimato + confronto con la sessione precedente dello stesso tipo
+        function buildHistoricalMsg(currentSession, currentSpmStr) {
             const currentSpm = parseInt(currentSpmStr);
             const blocksSpm = currentSession.smartrower.blocks.filter(b => b.target_spm === currentSpm);
-            let avgW = currentSession.avg_power;
-            let metricName = "Medio Sessione";
+            let avgW = currentSession.avg_power, metricName = "Medio Sessione";
             if (blocksSpm.length > 0) {
-                avgW = blocksSpm.reduce((acc, b) => acc + b.real_watts * b.duration_min, 0) / blocksSpm.reduce((acc, b) => acc + b.duration_min, 0);
+                avgW = blocksSpm.reduce((a, b) => a + b.real_watts * b.duration_min, 0) / blocksSpm.reduce((a, b) => a + b.duration_min, 0);
                 metricName = `a ${currentSpm} SPM`;
             }
-            
             avgW = Math.round(avgW);
             const paceS = 500 * Math.pow((2.80 / avgW), 1/3);
-            const paceMin = Math.floor(paceS / 60);
-            const paceSec = Math.floor(paceS % 60).toString().padStart(2, '0');
-            
-            let historicalMsg = `<hr style="border-color: rgba(255,255,255,0.1); margin: 1.5rem 0 1rem 0;">`;
-            historicalMsg += `⏱️ <strong>Passo Stimato (${metricName}):</strong> ${paceMin}:${paceSec} / 500m (con ${avgW} W).<br>`;
-            
-            const titleBase = currentSession.title.replace(/\d+$/, '').trim();
-            const prevSession = ALL_DATA.find(d => new Date(d.date) < new Date(currentSession.date) && d.title.startsWith(titleBase) && d.source === 'smartrower');
-            
-            if (prevSession) {
-                const prevBlocks = prevSession.smartrower.blocks.filter(b => b.target_spm === currentSpm);
-                let prevW = prevSession.avg_power;
-                if (prevBlocks.length > 0) {
-                    prevW = prevBlocks.reduce((acc, b) => acc + b.real_watts * b.duration_min, 0) / prevBlocks.reduce((acc, b) => acc + b.duration_min, 0);
-                }
-                prevW = Math.round(prevW);
-                
-                const prevPaceS = 500 * Math.pow((2.80 / prevW), 1/3);
-                const paceDiff = Math.round(prevPaceS - paceS); 
-                const powerDiff = Math.round(avgW - prevW);
-                const prevDateShort = new Date(prevSession.date).toLocaleDateString('it-IT', {day: '2-digit', month: 'short'});
-                
-                historicalMsg += `<br>📊 <strong>Confronto Storico (${prevDateShort}):</strong> `;
-                if (paceDiff > 0) {
-                    historicalMsg += `Rispetto all'ultima volta, a questa andatura hai guadagnato <strong>${paceDiff} secondi</strong> sul passo (+${powerDiff} W)! Ottimo miglioramento.`;
-                } else if (paceDiff < 0) {
-                    historicalMsg += `Rispetto all'ultima volta, hai perso circa <strong>${Math.abs(paceDiff)} secondi</strong> sul passo (${powerDiff} W). Concentrati sull'allungo.`;
-                } else {
-                    historicalMsg += `Stai mantenendo esattamente la stessa efficienza dell'ultimo allenamento (${avgW} W).`;
-                }
-            } else {
-                historicalMsg += `<br>📊 <em>Questa è la tua prima sessione registrata di tipo "${titleBase}". Dalla prossima vedrai i confronti storici!</em>`;
-            }
+            const paceStr = `${Math.floor(paceS/60)}:${Math.floor(paceS%60).toString().padStart(2,'0')}`;
+            let msg = `<hr style="border-color: rgba(255,255,255,0.1); margin: 1.25rem 0 1rem 0;">`;
+            msg += `⏱️ <strong>Passo Stimato (${metricName}):</strong> ${paceStr} / 500m (${avgW} W).`;
 
-            document.getElementById('srForceCoaching').innerHTML = coachMsg + historicalMsg;
+            const titleBase = currentSession.title.replace(/\d+$/, '').trim();
+            const prev = ALL_DATA.find(d => d.source === 'smartrower' && d.title && new Date(d.date) < new Date(currentSession.date) && d.title.startsWith(titleBase));
+            if (prev) {
+                const pb = prev.smartrower.blocks.filter(b => b.target_spm === currentSpm);
+                let prevW = pb.length ? pb.reduce((a, b) => a + b.real_watts * b.duration_min, 0) / pb.reduce((a, b) => a + b.duration_min, 0) : prev.avg_power;
+                prevW = Math.round(prevW);
+                const paceDiff = Math.round(500 * Math.pow((2.80 / prevW), 1/3) - paceS);
+                const prevDate = new Date(prev.date).toLocaleDateString('it-IT', {day:'2-digit', month:'short'});
+                msg += `<br>📊 <strong>vs ${prevDate}:</strong> `;
+                if (paceDiff > 0) msg += `+${paceDiff}s sul passo (+${avgW-prevW} W). Ottimo miglioramento.`;
+                else if (paceDiff < 0) msg += `${paceDiff}s sul passo (${avgW-prevW} W). Concentrati sull'allungo.`;
+                else msg += `stessa efficienza (${avgW} W).`;
+            } else {
+                msg += `<br>📊 <em>Prima sessione di tipo "${titleBase}": dalla prossima vedrai i confronti storici.</em>`;
+            }
+            return msg;
         }
 
-        function renderForceCurveChart(canvasId, force_curves) {
+        // Curva media (ensemble) normalizzata, con banda di riferimento della posizione-picco 32–40%
+        function renderPhaseCurve(canvasId, curve, xTitle, ref) {
             const ctx = document.getElementById(canvasId).getContext('2d');
-            if(window[canvasId+'_obj']) window[canvasId+'_obj'].destroy();
-            
-            const labels = Array.from({length: 60}, (_, i) => (i * 0.05).toFixed(2) + "s");
-
+            if (window[canvasId+'_obj']) window[canvasId+'_obj'].destroy();
+            if (!curve || !curve.length) return;
+            const n = curve.length;
+            const labels = curve.map((_, i) => Math.round(i/(n-1)*100));
+            // banda di riferimento posizione-picco 32–40% come area evidenziata
+            const pk = ref.peak_pos || [0.32, 0.40];
+            const bandFrom = Math.round(pk[0]*(n-1)), bandTo = Math.round(pk[1]*(n-1));
+            const maxY = Math.max(...curve) * 1.1;
+            const bandData = curve.map((_, i) => (i>=bandFrom && i<=bandTo) ? maxY : null);
+            const grad = ctx.createLinearGradient(0,0,0,280);
+            grad.addColorStop(0,'#f59e0b55'); grad.addColorStop(1,'#f59e0b00');
             window[canvasId+'_obj'] = new Chart(ctx, {
                 type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        { label: 'Inizio', data: force_curves.start, borderColor: '#10b981', backgroundColor: 'transparent', borderWidth: 2, tension: 0.4, pointRadius: 0 },
-                        { label: 'Centro', data: force_curves.mid, borderColor: '#f59e0b', backgroundColor: 'transparent', borderWidth: 2, tension: 0.4, pointRadius: 0 },
-                        { label: 'Fine', data: force_curves.end, borderColor: '#ef4444', backgroundColor: 'transparent', borderWidth: 2, tension: 0.4, pointRadius: 0 }
-                    ]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    plugins: { 
-                        legend: { display: true, labels:{color:'#9ca3af'} },
-                        tooltip: { mode: 'index', intersect: false }
-                    }, 
-                    scales: { 
-                        x: { title: {display: true, text: 'Tempo (s)', color: '#9ca3af'}, ticks:{color:'#9ca3af', maxTicksLimit: 10} }, 
-                        y: { title: {display: true, text: 'Forza', color: '#9ca3af'}, grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#9ca3af'} } 
-                    } 
+                data: { labels, datasets: [
+                    { label: 'Zona picco ideale 32–40%', data: bandData, borderColor:'transparent', backgroundColor:'rgba(245,158,11,0.10)', fill:true, pointRadius:0, tension:0 },
+                    { label: 'Forza media (kgf)', data: curve, borderColor:'#6366f1', backgroundColor:grad, borderWidth:2.5, tension:0.35, pointRadius:0, fill:true }
+                ]},
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true, labels:{color:'#9ca3af', font:{size:10}, filter:(li)=>li.text.indexOf('Zona')!==0} },
+                        tooltip: { mode:'index', intersect:false, callbacks:{ title:(it)=>`${it[0].label}% del drive`, label:(c)=> c.datasetIndex===1? `Forza: ${c.raw} kgf`:null } }
+                    },
+                    scales: {
+                        x: { title:{display:true, text:xTitle, color:'#9ca3af', font:{size:10}}, ticks:{color:'#9ca3af', maxTicksLimit:6, callback:(v,i)=>labels[i]+'%'} },
+                        y: { min:0, title:{display:true, text:'Forza (kgf)', color:'#9ca3af', font:{size:10}}, grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#9ca3af'} }
+                    }
                 }
             });
         }
@@ -1408,11 +1388,35 @@ forceSection.style.display = 'block';
             </div>
 
             <div class="sr-force-curve-section" style="margin-top: 2rem; background: rgba(255,255,255,0.02); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: none;">
-                <h3 style="margin-top:0; margin-bottom:1rem; font-family:var(--font-display); color: #fff;">Evoluzione Curva di Forza</h3>
+                <h3 style="margin-top:0; margin-bottom:0.35rem; font-family:var(--font-display); color: #fff;">Analisi Biomeccanica della Vogata</h3>
+                <p style="margin:0 0 1rem 0; font-size:0.82rem; color:var(--text-muted);">Metriche validate in letteratura (Kleshnev/Biorow, Holt et&nbsp;al. 2020) dai tre segnali: forza al manubrio, corsa della corda, corsa del sellino.</p>
+
+                <!-- Strip disponibilità segnali -->
+                <div id="srSignalStrip" style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem;"></div>
+
+                <!-- Tabs SPM -->
                 <div id="srForceSpmTabs" style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;"></div>
-                <div id="srForceCoaching" style="font-size: 0.95rem; color: #9ca3af; margin-bottom: 1.5rem; line-height: 1.5;"></div>
-                <div class="sr-chart-container" style="height: 300px;">
-                    <canvas id="srModalChartForceCurve"></canvas>
+
+                <!-- Griglia metriche con bande di riferimento -->
+                <div id="srBioMetrics" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:0.75rem; margin-bottom:1.25rem;"></div>
+
+                <!-- Cue di coaching prioritario -->
+                <div id="srForceCoaching" style="font-size: 0.92rem; color: #d1d5db; margin-bottom: 1.5rem; line-height: 1.55;"></div>
+
+                <!-- Due curve: forza-tempo e forza-posizione -->
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;" class="sr-curve-grid">
+                    <div>
+                        <div style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.04em;">Curva Forza · Tempo <span style="color:var(--text-muted);">(fase normalizzata)</span></div>
+                        <div class="sr-chart-container" style="height: 280px;">
+                            <canvas id="srModalChartForceCurve"></canvas>
+                        </div>
+                    </div>
+                    <div id="srFpWrap">
+                        <div style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.04em;">Curva Forza · Posizione <span style="color:var(--text-muted);">(% corsa)</span></div>
+                        <div class="sr-chart-container" style="height: 280px;">
+                            <canvas id="srModalChartForcePos"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1452,6 +1456,7 @@ forceSection.style.display = 'block';
         }
         .sr-close:hover { color: #fff; }
         .sr-chart-container { height: 250px; width: 100%; margin-bottom: 1rem; }
+        @media (max-width: 800px) { .sr-curve-grid { grid-template-columns: 1fr !important; } }
         .sr-table { width: 100%; border-collapse: collapse; text-align: left; }
         .sr-table th, .sr-table td { padding: 12px; border-bottom: 1px solid var(--border-glass); }
         .sr-table th { color: var(--text-secondary); font-weight: normal; }
