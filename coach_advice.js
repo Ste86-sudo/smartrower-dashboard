@@ -16,9 +16,9 @@ const COACH_ANALYSES = {
         ],
         analysis: {
             title: "🧬 Analisi: Long VO2max Intervals 2 (Il debito d'ossigeno)",
-            text: \`Un allenamento del genere crea un debito d'ossigeno enorme. I 12 secondi a 400W target (chiusi a ~265W) sono serviti come "innesco" neuromuscolare per preparare il sistema nervoso centrale, ma il vero lavoro lo hai fatto nei blocchi da 1 minuto.<br><br>
+            text: `Un allenamento del genere crea un debito d'ossigeno enorme. I 12 secondi a 400W target (chiusi a ~265W) sono serviti come "innesco" neuromuscolare per preparare il sistema nervoso centrale, ma il vero lavoro lo hai fatto nei blocchi da 1 minuto.<br><br>
                    Non farti frustrare dal fatto che nei blocchi da 300W non hai tenuto i 300W, ma sei sceso a 251W. Per la tua fisiologia attuale, 270W è già uno stimolo supramassimale. Il fatto che tu abbia tenuto i 180-190W di media nei blocchi di "recupero" da 3 minuti è ammirevole e dimostra un'eccellente capacità di clearing del lattato.<br><br>
-                   <strong>Il Prossimo Step:</strong> Questo allenamento richiede almeno 48h di recupero muscolare. Il prossimo deve essere un fondo lungo a bassissima intensità per favorire la capillarizzazione.\`
+                   <strong>Il Prossimo Step:</strong> Questo allenamento richiede almeno 48h di recupero muscolare. Il prossimo deve essere un fondo lungo a bassissima intensità per favorire la capillarizzazione.`
         },
         nextWorkout: {
             title: "Base Aerobica",
@@ -48,9 +48,9 @@ const COACH_ANALYSES = {
         ],
         analysis: {
             title: "🧬 Analisi: Aerobic Capacity 4 (L'esaurimento del Glicogeno)",
-            text: \`Non c'è niente di cui vergognarsi nell'aver fallito l'ultimo intervallo. Negli sport di potenza prolungata, colpire il "muro" muscolare è parte integrante dell'adattamento. <br><br>
+            text: `Non c'è niente di cui vergognarsi nell'aver fallito l'ultimo intervallo. Negli sport di potenza prolungata, colpire il "muro" muscolare è parte integrante dell'adattamento. <br><br>
                    Il fatto che il tuo cuore fosse a soli 153 bpm nel momento dell'abbandono (rispetto ai 160 bpm toccati poco prima) è la prova del nove: <em>cedimento periferico</em>, non centrale. Le gambe erano vuote. Probabilmente un calo di zuccheri o un mancato recupero dalla sessione precedente.<br><br>
-                   <strong>Il Prossimo Step:</strong> Impara ad ascoltare questi segnali. Quando le fibre esplosive sono "fritte", insistere porta solo a infortuni. Fai il carico di carboidrati e dedicati al defaticamento.\`
+                   <strong>Il Prossimo Step:</strong> Impara ad ascoltare questi segnali. Quando le fibre esplosive sono "fritte", insistere porta solo a infortuni. Fai il carico di carboidrati e dedicati al defaticamento.`
         },
         nextWorkout: {
             title: "Recovery Row",
