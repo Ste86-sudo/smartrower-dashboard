@@ -100,6 +100,43 @@ const COACH_ANALYSES = {
             totalDur: 3260
         }
     },
+    "Forward Push": {
+        theme: "🤖 Precisione Chirurgica: Un Metronomo Umano",
+        intro: "Hai eseguito questo allenamento di recupero con una perfezione quasi spaventosa. Sembra disegnato con il righello. Quando l'obiettivo è la rigenerazione, la disciplina nel rispettare il target è tutto.",
+        highlights: [
+            {
+                icon: "🎯",
+                title: "1. Aderenza Millimetrica",
+                text: "Nei blocchi da 18, 20, 22 e 24 SPM hai replicato i wattaggi richiesti senza sforare di un singolo watt. La curva di potenza sovrapposta a quella target non ha sbavature. Significa che il tuo controllo neuro-muscolare sulla catena cinetica è totale."
+            },
+            {
+                icon: "🧘‍♂️",
+                title: "2. Focus sulla Tecnica",
+                text: "Mantenendo frequenze cardiache così tranquille e potenze in zona aerobica bassa, hai trasformato questa sessione in un vero e proprio 'drilling' tecnico. Hai interiorizzato il ritmo di ogni specifica SPM in totale relax."
+            }
+        ],
+        analysis: {
+            title: "⚖️ Analisi: Forward Push (Recupero Attivo e Controllo)",
+            text: `Il nome "Forward Push" è azzeccatissimo, ma non si riferisce allo spingere in termini di forza bruta: si tratta di spingere in avanti la tua propriocezione e recuperare attivamente.<br><br>
+                   Un'aderenza così perfetta (hai evitato la classica tentazione di tirare più forte nei blocchi a 24 SPM!) permette al tuo corpo di smaltire la fatica accumulata nei giorni scorsi pur mantenendo il gesto atletico fresco e memorizzato nel sistema nervoso centrale.<br><br>
+                   <strong>Il Prossimo Step:</strong> Ora che hai dimostrato di avere un controllo totale a basse intensità, è il momento di riportare il motore su di giri con qualche variazione di ritmo in soglia.`
+        },
+        nextWorkout: {
+            title: "Threshold Variations",
+            type: "TEMPO",
+            desc: "Blocchi variabili tra zona aerobica alta e soglia, per riaccendere i motori gradualmente senza bruciarsi.",
+            steps: [
+                {"dur": 600, "pwr": 0.6},
+                {"dur": 600, "pwr": 0.8},
+                {"dur": 300, "pwr": 0.9},
+                {"dur": 600, "pwr": 0.8},
+                {"dur": 300, "pwr": 0.9},
+                {"dur": 600, "pwr": 0.5}
+            ],
+            maxPwr: 0.9,
+            totalDur: 3000
+        }
+    },
     "Aerobic Capacity 6": {
         theme: "👑 L'Apoteosi del Lattato: Sforzo Massimale",
         intro: "Questa sessione è stata un'escalation chirurgica. Hai affrontato tre blocchi a piramide arrivando ogni volta a sfiorare i tuoi limiti, con una precisione millimetrica sui wattaggi richiesti.",
