@@ -916,8 +916,8 @@
 
         // Render charts
         function renderCharts(data) {
-            // We want to sort chronologically for progression graph (oldest to newest)
-            const chronologicalData = [...data].reverse();
+            // Prendi le ultime 15 sessioni e inverti l'ordine per avere la più vecchia a sinistra e la più nuova a destra
+            const chronologicalData = [...data].slice(0, 15).reverse();
             const labels = chronologicalData.map(w => {
                 if (!w.date || w.date.includes("Unknown")) return "N/A";
                 const d = new Date(w.date.replace(/-/g, '/')); // Fix Safari parsing issues if any
