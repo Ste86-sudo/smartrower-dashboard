@@ -137,6 +137,41 @@ const COACH_ANALYSES = {
             totalDur: 3000
         }
     },
+    "Medium Tempo 1": {
+        theme: "🔥 Fornace Lipidica e Sweet Spot",
+        intro: "Bentornato sui binari del treno merci. Con questo 'Medium Tempo 1' sei entrato in quella magnifica zona (il famoso Sweet Spot a 180W) dove si bruciano i grassi, si tempra la mente e si sposta la soglia anaerobica verso l'alto senza massacrarsi.",
+        highlights: [
+            {
+                icon: "⏱️",
+                title: "1. 30 Minuti in Soglia",
+                text: "Hai gestito i due blocconi da 15 minuti a 180 Watt in maniera magistrale. Tenere i 24 SPM per tutto quel tempo richiede non solo forza, ma anche una grossa concentrazione mentale. Hai macinato watt su watt mantenendo l'aderenza chirurgica che ti contraddistingue."
+            },
+            {
+                icon: "❤️‍🔥",
+                title: "2. Deriva Cardiaca Contenuta",
+                text: "Guardando la frequenza cardiaca simulata nel secondo blocco da 15 minuti, hai retto benissimo lo sforzo. Il cuore è salito ma non è esploso. Significa che il motore aerobico sta iniziando a metabolizzare il lavoro di fondo."
+            }
+        ],
+        analysis: {
+            title: "🧬 Analisi: Medium Tempo 1 (La Zona 3/4)",
+            text: `Il <strong>Medium Tempo</strong> è il pane quotidiano del canottiere. Non è abbastanza leggero da farti riposare, ma non è così estremo da farti vomitare. È qui che avvengono i veri adattamenti fisiologici a lungo termine.<br><br>
+                   Costringendo il corpo a lavorare a ridosso dei 180W (circa 90% della tua FTP stimata), stai aumentando il numero e le dimensioni dei mitocondri nelle tue fibre muscolari lente e intermedie.<br><br>
+                   <strong>Il Prossimo Step:</strong> Visto che i 180W iniziano a starti comodi sui 15 minuti, il prossimo passo sarà testare la stessa intensità ma su blocchi ancora più lunghi o ridurre i tempi di recupero intermedi.`
+        },
+        nextWorkout: {
+            title: "Endurance Builder",
+            type: "AEROBIC",
+            desc: "Sessione lunga per costruire la base aerobica e massimizzare il volume settimanale.",
+            steps: [
+                {"dur": 600, "pwr": 0.6},
+                {"dur": 1800, "pwr": 0.7},
+                {"dur": 600, "pwr": 0.75},
+                {"dur": 600, "pwr": 0.5}
+            ],
+            maxPwr: 0.75,
+            totalDur: 3600
+        }
+    },
     "Aerobic Capacity 6": {
         theme: "👑 L'Apoteosi del Lattato: Sforzo Massimale",
         intro: "Questa sessione è stata un'escalation chirurgica. Hai affrontato tre blocchi a piramide arrivando ogni volta a sfiorare i tuoi limiti, con una precisione millimetrica sui wattaggi richiesti.",
