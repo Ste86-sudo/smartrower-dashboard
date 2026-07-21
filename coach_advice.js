@@ -263,14 +263,97 @@ function getPhaseColor(pwr) {
     return '#64748b'; // Grey
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Fallback generativo: costruisce l'analisi dai dati biomeccanici REALI della
+// sessione quando non esiste un commento scritto a mano per quel titolo.
+// Fonte dei giudizi: biomechanics.py (bande Kleshnev/Holt/Warmenhoven), che
+// per ogni metrica produce gia' grade + cue e un priority_cue.
+// ─────────────────────────────────────────────────────────────────────────────
+const GRADE_ICON = { ottimo: "✅", buono: "👍", da_migliorare: "⚠️", sperimentale: "🧪" };
+const METRIC_LABEL = {
+    fullness: "Pienezza della curva", peak_pos: "Posizione del picco",
+    dr_ratio: "Rapporto drive:recupero", catch_factor: "Catch factor",
+    rsf: "Rowing Style Factor"
+};
+
+function sessionProfile(w) {
+    const sr = w.smartrower || {};
+    const blocks = sr.blocks || [];
+    const powers = blocks.map(b => b.avg_power || 0).filter(p => p > 0);
+    const spread = powers.length ? Math.max(...powers) - Math.min(...powers) : 0;
+    const dur = w.duration_min || 0;
+    const avg = w.avg_power || 0;
+    if (spread > 80 && blocks.length >= 4) return { key: "interval", theme: "⚡ Sessione a intervalli", desc: `${blocks.length} blocchi con un'escursione di ${Math.round(spread)} W fra il piu' duro e il piu' leggero` };
+    if (avg > 0 && w.max_power && w.max_power > avg * 1.8) return { key: "mixed", theme: "🎯 Sessione mista", desc: "andatura di base con accelerazioni sopra soglia" };
+    if (dur >= 35) return { key: "endurance", theme: "🌊 Fondo aerobico", desc: `${Math.round(dur)} minuti continui di lavoro aerobico` };
+    return { key: "steady", theme: "🚣 Sessione costante", desc: `${Math.round(dur)} minuti a ritmo controllato` };
+}
+
+function generateAnalysis(w) {
+    const sr = w.smartrower;
+    if (!sr) return null;
+    const bio = sr.biomechanics || {};
+    const ses = bio.session || {};
+    const ass = ses.assessment || {};
+    const prof = sessionProfile(w);
+    const nStrokes = ses.n_strokes || 0;
+
+    // Intro: numeri reali della sessione
+    const bits = [];
+    if (w.distance_m) bits.push(`<strong>${(w.distance_m / 1000).toFixed(2)} km</strong>`);
+    if (w.duration_min) bits.push(`<strong>${Math.round(w.duration_min)} min</strong>`);
+    if (w.avg_power) bits.push(`<strong>${Math.round(w.avg_power)} W</strong> medi`);
+    if (w.avg_hr) bits.push(`<strong>${Math.round(w.avg_hr)} bpm</strong>`);
+    if (nStrokes) bits.push(`<strong>${nStrokes}</strong> colpi analizzati`);
+    const intro = `${prof.desc.charAt(0).toUpperCase() + prof.desc.slice(1)}: ${bits.join(" · ")}. ` +
+        `Il commento qui sotto e' generato dai tre segnali registrati a 100 Hz e confrontato con le bande di riferimento della letteratura.`;
+
+    // Highlights: una card per metrica giudicata, prima le cose da migliorare
+    const order = { da_migliorare: 0, buono: 1, ottimo: 2, sperimentale: 3 };
+    const highlights = Object.keys(ass)
+        .filter(k => k !== "priority_cue" && ass[k] && ass[k].cue)
+        .sort((a, b) => (order[ass[a].grade] ?? 9) - (order[ass[b].grade] ?? 9))
+        .map((k, i) => ({
+            icon: GRADE_ICON[ass[k].grade] || "•",
+            title: `${i + 1}. ${METRIC_LABEL[k] || k}`,
+            text: ass[k].cue
+        }));
+
+    // Sintesi + indicazione per la prossima sessione
+    const toFix = Object.keys(ass).filter(k => k !== "priority_cue" && ass[k] && ass[k].grade === "da_migliorare");
+    let text = ass.priority_cue
+        ? `<strong>Priorita' del giorno:</strong> ${ass.priority_cue}<br><br>`
+        : "";
+    if (ses.fullness && ses.peak_pos) {
+        text += `Forma della curva: pienezza <strong>${ses.fullness.toFixed(2)}</strong> ` +
+            `(banda ${bio.reference?.fullness?.[0]}–${bio.reference?.fullness?.[1]}), picco al ` +
+            `<strong>${Math.round(ses.peak_pos * 100)}%</strong> del drive ` +
+            `(ideale ${Math.round((bio.reference?.peak_pos?.[0] || 0.32) * 100)}–${Math.round((bio.reference?.peak_pos?.[1] || 0.4) * 100)}%)`;
+        if (ses.f_peak_n) text += `, picco di forza <strong>${Math.round(ses.f_peak_n)} N</strong>`;
+        if (ses.drive_length_m) text += `, passata <strong>${ses.drive_length_m.toFixed(2)} m</strong>`;
+        text += ".<br><br>";
+    }
+    text += toFix.length
+        ? `<strong>Prossimo step:</strong> lavora sul punto piu' debole (${toFix.map(k => METRIC_LABEL[k] || k).join(", ")}) in una sessione tecnica a ritmo basso, dove la correzione e' piu' facile da mantenere.`
+        : `<strong>Prossimo step:</strong> la tecnica regge su tutte le metriche disponibili — puoi alzare il carico senza perdere la forma.`;
+
+    return {
+        theme: prof.theme,
+        intro: intro,
+        highlights: highlights,
+        analysis: { title: `🧬 Analisi automatica: ${w.title}`, text: text }
+    };
+}
+
 function buildAdviceHTML(workout) {
     let analysisKey = workout.title;
     if (workout.title === "Regeneration training 4" && workout.date && workout.date.includes("2026-06-26")) {
         analysisKey = "Regeneration training 4 (26 June)";
     }
-    const analysisData = COACH_ANALYSES[analysisKey];
+    // Analisi scritta a mano se esiste, altrimenti generata dai dati della sessione
+    const analysisData = COACH_ANALYSES[analysisKey] || generateAnalysis(workout);
     if (!analysisData) {
-        return ""; // Se non c'è analisi specifica, non mostriamo nulla (oppure potremmo mostrare un fallback)
+        return "";
     }
 
     let html = `
