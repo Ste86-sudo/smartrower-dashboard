@@ -436,6 +436,10 @@ def analyze(df, seg_threshold, quality, force_col="real_force"):
     # e' la corsa DENTRO la trazione definita dalla forza. Cosi' non si perde una
     # sessione con 3 segnali validi solo per glitch fuori dal drive.  (cap. 6/Caveats)
     hard_dead = quality.get("sampling_1hz_bug", False)
+    # Il parser puo' dichiarare esplicitamente inaffidabili corda/sellino
+    # (FORCE_HR_ONLY): in quel caso NON rivalidarli dal segnale.
+    trust_cord = quality.get("cord_pos_alive", True)
+    trust_seat = quality.get("seat_pos_alive", True)
 
     def _drive_spans(sig):
         spans = []
@@ -452,12 +456,12 @@ def analyze(df, seg_threshold, quality, force_col="real_force"):
         return np.array(spans) if spans else np.array([])
 
     cord_alive = False
-    if cord is not None and not hard_dead and (cord.max() - cord.min()) > 0.1:
+    if cord is not None and trust_cord and not hard_dead and (cord.max() - cord.min()) > 0.1:
         cs = _drive_spans(cord)
         cord_alive = len(cs) >= 10 and 0.3 <= float(np.median(cs)) <= 1.6
 
     seat_alive = False
-    if seat is not None and not hard_dead and (seat.max() - seat.min()) > 0.02:
+    if seat is not None and trust_seat and not hard_dead and (seat.max() - seat.min()) > 0.02:
         ss = _drive_spans(seat)
         # esclude il canale rotto (corse metriche, >0.8 m) e il canale morto (<0.04 m)
         seat_alive = len(ss) >= 10 and 0.04 <= float(np.median(ss)) <= 0.80

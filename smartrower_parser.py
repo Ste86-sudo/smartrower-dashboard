@@ -11,6 +11,15 @@ import re
 from datetime import datetime
 import biomechanics as bio
 
+# ─────────────────────────────────────────────────────────────────────────────
+# MODALITA' SEGNALI FIDATI: finche' encoder (cord_pos) e sellino (seat_pos)
+# non sono calibrati sull'hardware, ci fidiamo SOLO di forza e battiti.
+# Con True: palate rilevate sempre dalla forza, watt/distanza dal modello
+# forza, niente metriche posizionali ne' di coordinazione (la biomeccanica
+# quality-aware degrada da sola). Rimettere False quando i sensori sono ok.
+FORCE_HR_ONLY = True
+# ─────────────────────────────────────────────────────────────────────────────
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CSV_DIR = os.path.join(BASE_DIR, "smartrower_downloads")
 OUT_JS = os.path.join(BASE_DIR, "smartrower_data.js")
@@ -143,6 +152,11 @@ def process_smartrower_csv(filepath):
         metadata['tss'] = f.readline().strip()
         
     df = pd.read_csv(filepath, skiprows=7)
+    # L'export puo' lasciare una riga troncata (NaN): un solo NaN rende nan la
+    # tara (np.percentile) e azzera l'intera analisi biomeccanica. Interpola i
+    # buchi e chiudi i bordi.
+    num_cols = df.select_dtypes("number").columns
+    df[num_cols] = df[num_cols].interpolate(limit_direction="both")
     df['time_s'] = df['time_ms'] / 1000.0
 
     # ── CALIBRAZIONE E QUALITÀ DEL DATO (HANDOFF_brief §4) ──────────────────────
@@ -173,6 +187,14 @@ def process_smartrower_csv(filepath):
     cord_frozen, cord_hold = (detect_sampling_freeze(df['cord_pos'].values, active_idx)
                               if cord_alive else (False, 0.0))
     seat_alive = bool((df['seat_pos'].max() - df['seat_pos'].min()) > 0.02)
+
+    if FORCE_HR_ONLY:
+        # Override esplicito: encoder e sellino non ancora calibrati.
+        if cord_alive or seat_alive:
+            print("  [i] FORCE_HR_ONLY: encoder/sellino ignorati per scelta, metriche dalla sola forza (+HR).")
+        cord_alive = False
+        cord_frozen = False
+        seat_alive = False
 
     data_quality = {
         "tara_kg": round(tara_kg, 2),
@@ -206,7 +228,7 @@ def process_smartrower_csv(filepath):
     # Find strokes: usa cord_pos se funziona, altrimenti real_force
     cord_range = df['cord_pos'].max() - df['cord_pos'].min()
     cord_broken = False
-    if cord_range > 10:
+    if cord_range > 10 and not FORCE_HR_ONLY:
         peaks, _ = find_peaks(df['cord_pos'], distance=100, prominence=0.1)
     else:
         print(f"  cord_pos rotto (range={cord_range:.1f}m), rilevamento palate da real_force")
