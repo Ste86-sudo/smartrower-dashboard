@@ -30,12 +30,14 @@ jobs:
           pip install fitparse pandas numpy scipy playwright
           python -m playwright install --with-deps chromium
 
-      - name: Run Parsers
-        run: |
-          # Esegue l'analisi per EXR
-          python analyzer.py
-          # Esegue l'analisi per SmartRower
-          python smartrower_parser.py
+      # L'analisi EXR richiede una sessione browser/credenziali che in CI non
+      # esistono: non deve mai bloccare il parser SmartRower.
+      - name: Run EXR analyzer (best effort)
+        continue-on-error: true
+        run: python analyzer.py
+
+      - name: Run SmartRower parser
+        run: python smartrower_parser.py
 
       - name: Commit and Push Changes
         run: |
