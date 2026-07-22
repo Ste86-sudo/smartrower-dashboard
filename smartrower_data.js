@@ -15,6 +15,22 @@ const SMARTROWER_DATA = [
     "max_cadence": 31.9,
     "smartrower": {
       "tss": "53",
+      "hr_analysis": {
+        "zones_pct": {
+          "Z1": 17.0,
+          "Z2": 10.8,
+          "Z3": 8.1,
+          "Z4": 18.5,
+          "Z5": 45.6
+        },
+        "trimp": 66.2,
+        "decoupling_pct": 13.3,
+        "eftp_w": 194.9,
+        "np_w": 191.6,
+        "if_factor": 0.958,
+        "tss": 58.1,
+        "hr_drift_bpm": 30.0
+      },
       "avg_peak_force": 47.3,
       "power_adherence_percent": 97.5,
       "blocks": [
@@ -6816,6 +6832,22 @@ const SMARTROWER_DATA = [
     "max_cadence": 26.6,
     "smartrower": {
       "tss": "61",
+      "hr_analysis": {
+        "zones_pct": {
+          "Z1": 4.2,
+          "Z2": 7.9,
+          "Z3": 10.4,
+          "Z4": 55.9,
+          "Z5": 21.6
+        },
+        "trimp": 36.4,
+        "decoupling_pct": 13.3,
+        "eftp_w": 197.6,
+        "np_w": 213.1,
+        "if_factor": 1.065,
+        "tss": 36.1,
+        "hr_drift_bpm": 17.4
+      },
       "avg_peak_force": 52.9,
       "power_adherence_percent": 92.8,
       "blocks": [
@@ -11898,6 +11930,22 @@ const SMARTROWER_DATA = [
     "max_cadence": 25.8,
     "smartrower": {
       "tss": "28",
+      "hr_analysis": {
+        "zones_pct": {
+          "Z1": 17.5,
+          "Z2": 21.8,
+          "Z3": 28.9,
+          "Z4": 31.8,
+          "Z5": 0.0
+        },
+        "trimp": 39.7,
+        "decoupling_pct": 6.3,
+        "eftp_w": 159.7,
+        "np_w": 165.3,
+        "if_factor": 0.826,
+        "tss": 34.1,
+        "hr_drift_bpm": 11.7
+      },
       "avg_peak_force": 41.1,
       "power_adherence_percent": 86.4,
       "blocks": [
@@ -17864,6 +17912,22 @@ const SMARTROWER_DATA = [
     "max_cadence": 25.0,
     "smartrower": {
       "tss": "62",
+      "hr_analysis": {
+        "zones_pct": {
+          "Z1": 27.4,
+          "Z2": 24.1,
+          "Z3": 28.2,
+          "Z4": 20.3,
+          "Z5": 0.0
+        },
+        "trimp": 15.3,
+        "decoupling_pct": 3.5,
+        "eftp_w": 155.5,
+        "np_w": 166.2,
+        "if_factor": 0.831,
+        "tss": 15.9,
+        "hr_drift_bpm": 24.6
+      },
       "avg_peak_force": 41.5,
       "power_adherence_percent": 96.6,
       "blocks": [
@@ -24145,6 +24209,22 @@ const SMARTROWER_DATA = [
     "max_cadence": 28.6,
     "smartrower": {
       "tss": "Don't push this one. Use it to investigate how your stroke rate affects your pace, and consider your technique. It's mostly a recovery session, please treat it as such.\"",
+      "hr_analysis": {
+        "zones_pct": {
+          "Z1": 40.9,
+          "Z2": 24.5,
+          "Z3": 34.6,
+          "Z4": 0.0,
+          "Z5": 0.0
+        },
+        "trimp": 12.4,
+        "decoupling_pct": 6.4,
+        "eftp_w": 149.3,
+        "np_w": 159.0,
+        "if_factor": 0.795,
+        "tss": 14.6,
+        "hr_drift_bpm": 25.2
+      },
       "avg_peak_force": 39.7,
       "power_adherence_percent": 90.4,
       "blocks": [
@@ -30510,6 +30590,7 @@ const SMARTROWER_DATA = [
     "max_cadence": 35.4,
     "smartrower": {
       "tss": "30",
+      "hr_analysis": null,
       "avg_peak_force": 37.5,
       "power_adherence_percent": 85.7,
       "blocks": [
@@ -35319,6 +35400,22 @@ const SMARTROWER_DATA = [
     "max_cadence": 32.6,
     "smartrower": {
       "tss": "54",
+      "hr_analysis": {
+        "zones_pct": {
+          "Z1": 5.2,
+          "Z2": 5.4,
+          "Z3": 8.1,
+          "Z4": 36.8,
+          "Z5": 34.1
+        },
+        "trimp": 92.5,
+        "decoupling_pct": 11.4,
+        "eftp_w": 179.1,
+        "np_w": 184.6,
+        "if_factor": 0.923,
+        "tss": 62.2,
+        "hr_drift_bpm": 19.2
+      },
       "avg_peak_force": 45.4,
       "power_adherence_percent": 93.0,
       "blocks": [
@@ -42084,3 +42181,5 @@ const SMARTROWER_DATA = [
     }
   }
 ];
+window.SR_ATHLETE = {"ftp_w": 200.0, "hr_max": 185, "hr_rest": 55};
+window.SR_TRENDS = [{"date": "2026-06-24", "title": "Aerobic Capacity 6", "avg_power": 178.8, "avg_hr": 154, "eftp_w": 179.1, "trimp": 92.5, "decoupling_pct": 11.4, "if_factor": 0.923}, {"date": "2026-06-26", "title": "Regeneration training 4", "avg_power": 147.5, "avg_hr": 0, "eftp_w": null, "trimp": null, "decoupling_pct": null, "if_factor": null}, {"date": "2026-07-01", "title": "Forward Push", "avg_power": 157.2, "avg_hr": 122, "eftp_w": 149.3, "trimp": 12.4, "decoupling_pct": 6.4, "if_factor": 0.795}, {"date": "2026-07-08", "title": "Medium Tempo 1", "avg_power": 163.7, "avg_hr": 129, "eftp_w": 155.5, "trimp": 15.3, "decoupling_pct": 3.5, "if_factor": 0.831}, {"date": "2026-07-08", "title": "The Mock Mission", "avg_power": 162.3, "avg_hr": 136, "eftp_w": 159.7, "trimp": 39.7, "decoupling_pct": 6.3, "if_factor": 0.826}, {"date": "2026-07-13", "title": "Kilometer Climb: Long", "avg_power": 208.0, "avg_hr": 150, "eftp_w": 197.6, "trimp": 36.4, "decoupling_pct": 13.3, "if_factor": 1.065}, {"date": "2026-07-16", "title": "Aerobic Power 2", "avg_power": 186.5, "avg_hr": 146, "eftp_w": 194.9, "trimp": 66.2, "decoupling_pct": 13.3, "if_factor": 0.958}];

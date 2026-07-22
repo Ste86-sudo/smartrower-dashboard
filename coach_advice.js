@@ -319,6 +319,48 @@ function generateAnalysis(w) {
             text: ass[k].cue
         }));
 
+    // Card cardio/FTP dai segnali fidati (HR + watt da forza)
+    const ha = sr.hr_analysis;
+    if (ha) {
+        if (ha.decoupling_pct != null) {
+            const dOK = ha.decoupling_pct <= 5;
+            highlights.push({ icon: dOK ? "✅" : "⚠️",
+                title: `${highlights.length + 1}. Decoupling Pw:HR`,
+                text: `${ha.decoupling_pct}% fra prima e seconda meta' (deriva HR ${ha.hr_drift_bpm > 0 ? "+" : ""}${ha.hr_drift_bpm} bpm). ` +
+                    (dOK ? "Sotto il 5%: base aerobica solida per questa intensita'."
+                         : "Sopra il 5%: il cuore rincorre i watt — servono piu' minuti in Z2 prima di alzare il carico.") });
+        }
+        if (ha.zones_pct) {
+            const zmax = Object.entries(ha.zones_pct).sort((a, b) => b[1] - a[1])[0];
+            highlights.push({ icon: "❤️", title: `${highlights.length + 1}. Zone cardio & carico`,
+                text: `Zona dominante <strong>${zmax[0]}</strong> (${zmax[1]}% del tempo) — ` +
+                    Object.entries(ha.zones_pct).map(([z, v]) => `${z} ${v}%`).join(" · ") +
+                    `. TRIMP <strong>${ha.trimp}</strong>, TSS <strong>${ha.tss}</strong> (IF ${ha.if_factor}).` });
+        }
+        if (ha.eftp_w) {
+            const ftp = (window.SR_ATHLETE || {}).ftp_w || 200;
+            const d = Math.round((ha.eftp_w / ftp - 1) * 100);
+            highlights.push({ icon: d >= 0 ? "📈" : "📉", title: `${highlights.length + 1}. FTP stimata`,
+                text: `eFTP di giornata <strong>${Math.round(ha.eftp_w)} W</strong> (95% della miglior media 20', NP ${Math.round(ha.np_w)} W) — ` +
+                    `${d >= 0 ? "+" : ""}${d}% rispetto alla FTP dichiarata di ${ftp} W` +
+                    (d >= 5 ? ": probabilmente e' ora di aggiornarla." : ".") });
+        }
+        // Trend sulle ultime sessioni
+        const tr = (window.SR_TRENDS || []).filter(x => x.eftp_w);
+        if (tr.length >= 3) {
+            const last3 = tr.slice(-3), prev = tr.slice(0, -3);
+            const avg = a => a.reduce((s, x) => s + x.eftp_w, 0) / a.length;
+            const load7 = (window.SR_TRENDS || []).slice(-7).reduce((s, x) => s + (x.trimp || 0), 0);
+            let ttxt = `TRIMP cumulato ultime ${Math.min(7, (window.SR_TRENDS || []).length)} sessioni: <strong>${Math.round(load7)}</strong>.`;
+            if (prev.length) {
+                const dW = avg(last3) - avg(prev);
+                ttxt = `eFTP media ultime 3 sessioni <strong>${Math.round(avg(last3))} W</strong> ` +
+                    `(${dW >= 0 ? "+" : ""}${Math.round(dW)} W vs precedenti). ` + ttxt;
+            }
+            highlights.push({ icon: "📊", title: `${highlights.length + 1}. Trend`, text: ttxt });
+        }
+    }
+
     // Sintesi + indicazione per la prossima sessione
     const toFix = Object.keys(ass).filter(k => k !== "priority_cue" && ass[k] && ass[k].grade === "da_migliorare");
     let text = ass.priority_cue

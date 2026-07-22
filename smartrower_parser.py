@@ -18,6 +18,41 @@ import biomechanics as bio
 # forza, niente metriche posizionali ne' di coordinazione (la biomeccanica
 # quality-aware degrada da sola). Rimettere False quando i sensori sono ok.
 FORCE_HR_ONLY = True
+
+# Profilo atleta per le analisi HR/FTP (aggiornare qui quando cambia la forma)
+ATHLETE = {"ftp_w": 200.0, "hr_max": 185, "hr_rest": 55}
+
+def analyze_hr_ftp(df_active, dur_min):
+    """Analisi cardio e di intensita' dai due segnali fidati (watt da forza + HR):
+    zone HR in %HRR (Karvonen), TRIMP Banister, decoupling Pw:HR fra le due
+    meta', eFTP = 95% della best 20-min power (Coggan), NP/IF/TSS, deriva HR."""
+    out = {}
+    hr = df_active["heart_rate"].astype(float)
+    w  = df_active["real_watts"].astype(float)
+    if hr.isna().all() or hr.max() <= 0:
+        return None
+    hrr = max(1, ATHLETE["hr_max"] - ATHLETE["hr_rest"])
+    pct = ((hr - ATHLETE["hr_rest"]) / hrr).clip(0, 1.2)
+    edges = [0, .5, .6, .7, .8, .9, 10]
+    n = len(pct)
+    out["zones_pct"] = {z: round(100 * float(((pct >= edges[i]) & (pct < edges[i+1])).sum()) / n, 1)
+                        for i, z in enumerate(["Z1", "Z2", "Z3", "Z4", "Z5"])}
+    hr_frac = float(pct.mean())
+    out["trimp"] = round(dur_min * hr_frac * 0.64 * float(np.exp(1.92 * hr_frac)), 1)
+    h = n // 2
+    r1 = w.iloc[:h].mean() / max(1.0, hr.iloc[:h].mean())
+    r2 = w.iloc[h:].mean() / max(1.0, hr.iloc[h:].mean())
+    out["decoupling_pct"] = round(100 * (r1 - r2) / r1, 1) if r1 > 0 else None
+    win = min(1200, n)
+    if win >= 300:
+        out["eftp_w"] = round(0.95 * float(w.rolling(win).mean().max()), 1)
+    np_ = float(w.pow(4).rolling(30, min_periods=1).mean().mean()) ** 0.25
+    out["np_w"] = round(np_, 1)
+    out["if_factor"] = round(np_ / ATHLETE["ftp_w"], 3)
+    out["tss"] = round(dur_min / 60 * out["if_factor"] ** 2 * 100, 1)
+    out["hr_drift_bpm"] = round(float(hr.iloc[h:].mean() - hr.iloc[:h].mean()), 1)
+    return out
+
 # ─────────────────────────────────────────────────────────────────────────────
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -590,6 +625,7 @@ def process_smartrower_csv(filepath):
         "max_cadence": round(np.max(spm), 1) if len(spm)>0 else 0,
         "smartrower": {
             "tss": metadata['tss'],
+            "hr_analysis": analyze_hr_ftp(df_active, df['time_s'].max() / 60.0),
             "avg_peak_force": round(np.mean(peak_forces), 1) if len(peak_forces)>0 else 0,
             "power_adherence_percent": round(adherence_power, 1),
             "blocks": blocks_out,
@@ -627,6 +663,17 @@ def main():
     
     with open(OUT_JS, 'w', encoding='utf-8') as f:
         f.write("const SMARTROWER_DATA = " + json.dumps(results, indent=2) + ";\n")
+        chrono = sorted(results, key=lambda x: x['date'])
+        trends = [{
+            "date": r["date"][:10], "title": r["title"],
+            "avg_power": r["avg_power"], "avg_hr": r["avg_hr"],
+            "eftp_w": (r["smartrower"].get("hr_analysis") or {}).get("eftp_w"),
+            "trimp": (r["smartrower"].get("hr_analysis") or {}).get("trimp"),
+            "decoupling_pct": (r["smartrower"].get("hr_analysis") or {}).get("decoupling_pct"),
+            "if_factor": (r["smartrower"].get("hr_analysis") or {}).get("if_factor"),
+        } for r in chrono]
+        f.write("window.SR_ATHLETE = " + json.dumps(ATHLETE) + ";" + chr(10))
+        f.write("window.SR_TRENDS = " + json.dumps(trends) + ";" + chr(10))
     print(f"Wrote {OUT_JS} with {len(results)} sessions.")
 
 if __name__ == "__main__":
